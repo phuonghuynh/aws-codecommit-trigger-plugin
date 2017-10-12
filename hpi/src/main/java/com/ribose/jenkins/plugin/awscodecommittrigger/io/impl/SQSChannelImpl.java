@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.net;
+package com.ribose.jenkins.plugin.awscodecommittrigger.io.impl;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.*;
 import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueue;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.RequestFactory;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.SQSChannel;
 import com.ribose.jenkins.plugin.awscodecommittrigger.logging.Log;
 import org.apache.commons.collections.CollectionUtils;
 

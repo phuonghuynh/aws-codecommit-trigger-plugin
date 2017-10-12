@@ -16,7 +16,8 @@
 
 package com.ribose.jenkins.plugin.awscodecommittrigger.matchers;
 
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.EventTriggerMatcher;
+import com.ribose.jenkins.plugin.awscodecommittrigger.matchers.impl.AndEventTriggerMatcher;
+import com.ribose.jenkins.plugin.awscodecommittrigger.matchers.impl.OrEventTriggerMatcher;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;

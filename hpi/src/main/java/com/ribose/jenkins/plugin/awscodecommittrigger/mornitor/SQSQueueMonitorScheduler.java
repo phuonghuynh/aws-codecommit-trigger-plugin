@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.interfaces;
+package com.ribose.jenkins.plugin.awscodecommittrigger.mornitor;
 
 import com.google.common.eventbus.Subscribe;
+import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueueListener;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.events.ConfigurationChangedEvent;
 
 

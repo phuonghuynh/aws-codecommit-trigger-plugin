@@ -51,6 +51,24 @@
     </developers>
 
     <dependencies>
+        <!--<dependency>-->
+            <!--<groupId>com.amazonaws</groupId>-->
+            <!--<artifactId>aws-java-sdk-sqs</artifactId>-->
+            <!--<optional>true</optional>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+            <!--<groupId>com.fasterxml.jackson.core</groupId>-->
+            <!--<artifactId>jackson-databind</artifactId>-->
+            <!--<optional>true</optional>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+            <!--<groupId>com.fasterxml.jackson.dataformat</groupId>-->
+            <!--<artifactId>jackson-dataformat-cbor</artifactId>-->
+            <!--<optional>true</optional>-->
+        <!--</dependency>-->
+
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>shaded</artifactId>
@@ -177,6 +195,27 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!--org.jenkins-ci.tools:maven-hpi-plugin:2.1:list-plugin-dependencies-->
+            <!--<plugin>-->
+                <!--<groupId>org.jenkins-ci.tools</groupId>-->
+                <!--<artifactId>maven-hpi-plugin</artifactId>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>list-plugin-dependencies</id>-->
+                        <!--<goals>-->
+                            <!--<goal>list-plugin-dependencies</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<dependentWarExcludes></dependentWarExcludes>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+                <!--<version>2.1</version>-->
+                <!--<configuration>-->
+                    <!--<dependentWarExcludes></dependentWarExcludes>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 

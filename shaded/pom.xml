@@ -16,6 +16,7 @@
     </properties>
 
     <dependencies>
+        <!-- NOTE: all dependencies here should be set as optional in used pom -->
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-sqs</artifactId>

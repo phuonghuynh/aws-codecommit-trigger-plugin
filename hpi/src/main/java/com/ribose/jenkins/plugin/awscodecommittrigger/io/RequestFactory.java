@@ -1,5 +1,5 @@
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.net;
+package com.ribose.jenkins.plugin.awscodecommittrigger.io;
 
 import com.amazonaws.services.sqs.model.DeleteMessageBatchRequest;
 import com.amazonaws.services.sqs.model.Message;

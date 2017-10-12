@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.threading;
+package com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.impl;
 
 import com.google.inject.Inject;
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.ExecutorProvider;
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSExecutorFactory;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.threads.SQSExecutorFactory;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.ExecutorProvider;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;

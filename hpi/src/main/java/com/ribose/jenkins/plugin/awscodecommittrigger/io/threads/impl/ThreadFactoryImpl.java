@@ -1,5 +1,4 @@
 /*
- * Copyright 2017 Ribose Inc. <https://www.ribose.com>
  * Copyright 2016 M-Way Solutions GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.interfaces;
+package com.ribose.jenkins.plugin.awscodecommittrigger.io.threads.impl;
 
-import com.ribose.jenkins.plugin.awscodecommittrigger.model.job.SQSJob;
-import hudson.model.Job;
-
-import java.util.List;
+import javax.annotation.Nonnull;
+import java.util.concurrent.ThreadFactory;
 
 
-/**
- * Interface definition for classes that match events to {@link Job}s. If an event
- * matches a project its build process should be triggered.
- */
-public interface EventTriggerMatcher {
-    boolean matches(List<Event> events, SQSJob job);
+public class ThreadFactoryImpl implements ThreadFactory {
+
+    @Override
+    public Thread newThread(@Nonnull final Runnable r) {
+        final Thread thread = new Thread(r);
+        thread.setPriority(Thread.MIN_PRIORITY);
+        return thread;
+    }
 }

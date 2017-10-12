@@ -14,18 +14,7 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.net;
+package com.ribose.jenkins.plugin.awscodecommittrigger.io.threads;
 
-import com.amazonaws.services.sqs.model.Message;
-
-import java.util.List;
-
-
-public interface SQSChannel {
-
-    List<Message> getMessages();
-
-    void deleteMessages(List<Message> messages);
-
-    String getQueueUuid();
+public interface SQSExecutorFactory extends com.amazonaws.client.builder.ExecutorFactory {
 }

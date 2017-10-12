@@ -14,13 +14,13 @@
             </j:if>
         </f:block>
 
-        <f:block>
-            <span>User required permissions from AWS SQS to make the plugin work</span>
-            <ul>
-                <li>sqs:ReceiveMessage</li>
-                <li>sqs:DeleteMessageBatch</li>
-            </ul>
-        </f:block>
+        <!--<f:block>-->
+            <!--<span>User required permissions from AWS SQS to make the plugin work</span>-->
+            <!--<ul>-->
+                <!--<li>sqs:ReceiveMessage</li>-->
+                <!--<li>sqs:DeleteMessageBatch</li>-->
+            <!--</ul>-->
+        <!--</f:block>-->
 
         <f:nested>
             <table style="width:100%">

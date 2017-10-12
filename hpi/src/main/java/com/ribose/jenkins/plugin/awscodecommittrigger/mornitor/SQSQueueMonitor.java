@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.interfaces;
+package com.ribose.jenkins.plugin.awscodecommittrigger.mornitor;
 
 import com.amazonaws.services.sqs.model.Message;
-import com.ribose.jenkins.plugin.awscodecommittrigger.net.SQSChannel;
+import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueue;
+import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueueListener;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.SQSChannel;
 
 
 /**

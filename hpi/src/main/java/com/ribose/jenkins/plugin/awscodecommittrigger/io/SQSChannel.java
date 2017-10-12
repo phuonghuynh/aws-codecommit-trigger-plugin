@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.factories;
+package com.ribose.jenkins.plugin.awscodecommittrigger.io;
 
-import java.util.concurrent.ThreadFactory;
+import com.amazonaws.services.sqs.model.Message;
+
+import java.util.List;
 
 
-public class ThreadFactoryImpl implements ThreadFactory {
+public interface SQSChannel {
 
-    @Override
-    public Thread newThread(final Runnable r) {
-        final Thread thread = new Thread(r);
-        thread.setPriority(Thread.MIN_PRIORITY);
-        return thread;
-    }
+    List<Message> getMessages();
+
+    void deleteMessages(List<Message> messages);
+
+    String getQueueUuid();
 }

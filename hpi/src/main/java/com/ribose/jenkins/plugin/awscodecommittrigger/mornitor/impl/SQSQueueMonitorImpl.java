@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.threading;
+package com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.impl;
 
 import com.amazonaws.services.sqs.model.Message;
 import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueue;
 import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueueListener;
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueueMonitor;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.SQSChannel;
 import com.ribose.jenkins.plugin.awscodecommittrigger.logging.Log;
-import com.ribose.jenkins.plugin.awscodecommittrigger.net.SQSChannel;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.SQSQueueMonitor;
 
 import java.util.ArrayList;
 import java.util.List;

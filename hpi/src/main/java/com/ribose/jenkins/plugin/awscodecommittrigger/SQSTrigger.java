@@ -29,11 +29,13 @@ import com.ribose.jenkins.plugin.awscodecommittrigger.exception.UnexpectedExcept
 import com.ribose.jenkins.plugin.awscodecommittrigger.i18n.sqstrigger.Messages;
 import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.*;
 import com.ribose.jenkins.plugin.awscodecommittrigger.logging.Log;
+import com.ribose.jenkins.plugin.awscodecommittrigger.matchers.EventTriggerMatcher;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.events.ConfigurationChangedEvent;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.events.EventBroker;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.job.RepoInfo;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.job.SQSJob;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.job.SQSJobFactory;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.SQSQueueMonitorScheduler;
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
@@ -62,6 +64,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static com.ribose.jenkins.plugin.awscodecommittrigger.PluginInfo.compatibleSinceVersion;
 
 
 public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
@@ -373,7 +377,7 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
 
             for (SQSTriggerQueue sqsQueue : this.sqsQueues) {
                 String version = sqsQueue.getVersion();
-                boolean compatible =  com.ribose.jenkins.plugin.awscodecommittrigger.utils.StringUtils.checkCompatibility(version,  com.ribose.jenkins.plugin.awscodecommittrigger.PluginInfo.compatibleSinceVersion);
+                boolean compatible =  com.ribose.jenkins.plugin.awscodecommittrigger.utils.StringUtils.checkCompatibility(version,  compatibleSinceVersion);
                 sqsQueue.setCompatible(compatible);
             }
 

@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class JenkinsIRIT extends AbstractFreestyleParamsIT {
+public class InternalTriggerConfigIT extends AbstractFreestyleParamsIT {
 
     /* Freestyle Job SCM integration test (type="IR")
 
