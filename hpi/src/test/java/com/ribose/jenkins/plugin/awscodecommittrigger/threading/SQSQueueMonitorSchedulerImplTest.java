@@ -16,8 +16,14 @@
 
 package com.ribose.jenkins.plugin.awscodecommittrigger.threading;
 
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.*;
+import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueue;
+import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueueListener;
+import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueueProvider;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.SQSFactory;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.events.ConfigurationChangedEvent;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.SQSQueueMonitor;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.SQSQueueMonitorScheduler;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.impl.SQSQueueMonitorSchedulerImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -307,6 +313,6 @@ public class SQSQueueMonitorSchedulerImplTest {
         Mockito.verify(this.monitorA).isShutDown();
         Mockito.verify(this.monitorB).shutDown();
         Mockito.verifyNoMoreInteractions(this.monitorA);
-        Mockito.verifyNoMoreInteractions(this.monitorB);
+        Mockito.verifyNoMoreInteractions(this.monitorB);//327191225
     }
 }

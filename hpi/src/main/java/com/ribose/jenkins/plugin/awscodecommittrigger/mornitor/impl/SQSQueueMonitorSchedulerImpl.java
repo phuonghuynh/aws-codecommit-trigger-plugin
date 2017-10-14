@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.threading;
+package com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.impl;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.*;
+import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueue;
+import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueueListener;
+import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueueProvider;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.SQSFactory;
 import com.ribose.jenkins.plugin.awscodecommittrigger.logging.Log;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.events.ConfigurationChangedEvent;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.events.EventBroker;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.SQSQueueMonitor;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.SQSQueueMonitorScheduler;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -35,16 +40,16 @@ public class SQSQueueMonitorSchedulerImpl implements SQSQueueMonitorScheduler {
     private static final Log log = Log.get(SQSQueueMonitorSchedulerImpl.class);
 
     private final ExecutorService executor;
-    private final SQSQueueProvider provider;
-    private SQSFactory factory;
+    private final SQSQueueProvider sqsQueueProvider;
+    private SQSFactory sqsFactory;
 
     private final Map<String, SQSQueueMonitor> monitors = new HashMap<>();
 
     @Inject
-    public SQSQueueMonitorSchedulerImpl(final ExecutorService executor, final SQSQueueProvider provider, final SQSFactory factory) {
+    public SQSQueueMonitorSchedulerImpl(final ExecutorService executor, final SQSQueueProvider sqsQueueProvider, final SQSFactory sqsFactory) {
         this.executor = executor;
-        this.provider = provider;
-        this.factory = factory;
+        this.sqsQueueProvider = sqsQueueProvider;
+        this.sqsFactory = sqsFactory;
 
         EventBroker.getInstance().register(this);
     }
@@ -53,7 +58,7 @@ public class SQSQueueMonitorSchedulerImpl implements SQSQueueMonitorScheduler {
     public boolean register(final SQSQueueListener listener) {
         log.debug("Register SQS listener");
         final String uuid = listener.getQueueUuid();
-        final SQSQueue queue = this.provider.getSqsQueue(uuid);
+        final SQSQueue queue = this.sqsQueueProvider.getSqsQueue(uuid);
 
         if (queue == null) {
             log.warning("No queue for {%s}, aborted", uuid);
@@ -108,7 +113,7 @@ public class SQSQueueMonitorSchedulerImpl implements SQSQueueMonitorScheduler {
 
         if (monitor == null) {
             log.debug("No monitor exists, creating new monitor for %s", queue);
-            monitor = this.factory.createMonitor(this.executor, queue);
+            monitor = this.sqsFactory.createMonitor(this.executor, queue);
             this.monitors.put(uuid, monitor);
         }
 
@@ -119,7 +124,7 @@ public class SQSQueueMonitorSchedulerImpl implements SQSQueueMonitorScheduler {
     private synchronized void reconfigure(final Iterator<Entry<String, SQSQueueMonitor>> entries, final Entry<String, SQSQueueMonitor> entry) {
         final String uuid = entry.getKey();
         SQSQueueMonitor monitor = entry.getValue();
-        final SQSQueue queue = this.provider.getSqsQueue(uuid);
+        final SQSQueue queue = this.sqsQueueProvider.getSqsQueue(uuid);
 
         if (queue == null) {
             log.debug("Queue {%s} removed, shut down monitor", uuid);
@@ -127,7 +132,7 @@ public class SQSQueueMonitorSchedulerImpl implements SQSQueueMonitorScheduler {
             entries.remove();
         } else if (monitor.isShutDown() || this.hasQueueChanged(monitor, queue)) {
             log.debug("Queue {%s} changed or monitor stopped, create new monitor", uuid);
-            monitor = this.factory.createMonitor(monitor, queue);
+            monitor = this.sqsFactory.createMonitor(monitor, queue);
             entry.setValue(monitor).shutDown();
             this.executor.execute(monitor);
         }
@@ -135,32 +140,21 @@ public class SQSQueueMonitorSchedulerImpl implements SQSQueueMonitorScheduler {
 
     private boolean hasQueueChanged(final SQSQueueMonitor monitor, final SQSQueue queue) {
         try {
-            final SQSQueue current = monitor.getQueue();
+            final SQSQueue currentQueue = monitor.getQueue();
 
-            if (!StringUtils.equals(current.getUrl(), queue.getUrl())) {
-                return true;
-            }
+            boolean changed = !StringUtils.equalsIgnoreCase(currentQueue.getUrl(), queue.getUrl()); //queue url changed?
+            changed = changed || !StringUtils.equalsIgnoreCase(currentQueue.getCredentialsId(), queue.getCredentialsId()); //credentials changed?
+            changed = changed || currentQueue.getMaxNumberOfMessages() != queue.getMaxNumberOfMessages(); //max number messages changed?
+            changed = changed || currentQueue.getWaitTimeSeconds() != queue.getWaitTimeSeconds(); //waiting time changed?
 
-            if (!StringUtils.equals(current.getCredentialsId(), queue.getCredentialsId())) {
-                return true;
-            }
-
-            if (current.getMaxNumberOfMessages() != queue.getMaxNumberOfMessages()) {
-                return true;
-            }
-
-            if (current.getWaitTimeSeconds() != queue.getWaitTimeSeconds()) {
-                return true;
-            }
-
-            return false;
+            return changed;
         } catch (Exception e) {
             log.warning("Cannot compare queues: %s, error: %s", e.getMessage(), e);
         }
         return true;
     }
 
-    public synchronized void setFactory(SQSFactory factory) {
-        this.factory = factory;
+    public synchronized void setSqsFactory(SQSFactory sqsFactory) {
+        this.sqsFactory = sqsFactory;
     }
 }

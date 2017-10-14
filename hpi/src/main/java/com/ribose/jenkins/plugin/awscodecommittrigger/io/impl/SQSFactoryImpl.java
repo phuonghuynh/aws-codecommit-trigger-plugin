@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.factories;
+package com.ribose.jenkins.plugin.awscodecommittrigger.io.impl;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.PredefinedClientConfigurations;
@@ -29,15 +29,14 @@ import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
 import com.amazonaws.services.sqs.buffered.AmazonSQSBufferedAsyncClient;
 import com.amazonaws.services.sqs.buffered.QueueBufferConfig;
 import com.google.inject.Inject;
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSExecutorFactory;
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSFactory;
 import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueue;
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueueMonitor;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.RequestFactory;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.SQSChannel;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.SQSFactory;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.threads.SQSExecutorFactory;
 import com.ribose.jenkins.plugin.awscodecommittrigger.logging.Log;
-import com.ribose.jenkins.plugin.awscodecommittrigger.net.RequestFactory;
-import com.ribose.jenkins.plugin.awscodecommittrigger.net.SQSChannel;
-import com.ribose.jenkins.plugin.awscodecommittrigger.net.SQSChannelImpl;
-import com.ribose.jenkins.plugin.awscodecommittrigger.threading.SQSQueueMonitorImpl;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.SQSQueueMonitor;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.impl.SQSQueueMonitorImpl;
 import hudson.ProxyConfiguration;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
@@ -52,11 +51,11 @@ public class SQSFactoryImpl implements SQSFactory {
     private static final Log log = Log.get(SQSFactoryImpl.class);
 
     private final RequestFactory factory;
-    private final SQSExecutorFactory SQSExecutorFactory;
+    private final SQSExecutorFactory sqsExecutorFactory;
 
     @Inject
-    public SQSFactoryImpl(final SQSExecutorFactory SQSExecutorFactory, final RequestFactory factory) {
-        this.SQSExecutorFactory = SQSExecutorFactory;
+    public SQSFactoryImpl(final SQSExecutorFactory sqsExecutorFactory, final RequestFactory factory) {
+        this.sqsExecutorFactory = sqsExecutorFactory;
         this.factory = factory;
     }
 
@@ -65,16 +64,14 @@ public class SQSFactoryImpl implements SQSFactory {
         AWSCredentialsProvider credentials = queue.hasCredentials() ? queue.lookupAwsCredentials() : DefaultAWSCredentialsProviderChain.getInstance();
         AmazonSQSAsyncClientBuilder sqsAsyncBuilder = createStandardAsyncClientBuilder(queue, credentials);
         final QueueBufferConfig queueBufferConfig = this.getQueueBufferConfig(queue);
-        final AmazonSQSBufferedAsyncClient sqsBufferedAsync = new AmazonSQSBufferedAsyncClient(sqsAsyncBuilder.build(), queueBufferConfig);
-        return sqsBufferedAsync;
+        return new AmazonSQSBufferedAsyncClient(sqsAsyncBuilder.build(), queueBufferConfig);
     }
 
     @Override
     public AmazonSQS createSQSAsync(String accessKey, String secretKey) {
         AmazonSQSAsyncClientBuilder sqsAsyncBuilder = createStandardAsyncClientBuilder(null, new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)));
         final QueueBufferConfig queueBufferConfig = this.getQueueBufferConfig(null);
-        final AmazonSQSBufferedAsyncClient sqsBufferedAsync = new AmazonSQSBufferedAsyncClient(sqsAsyncBuilder.build(), queueBufferConfig);
-        return sqsBufferedAsync;
+        return new AmazonSQSBufferedAsyncClient(sqsAsyncBuilder.build(), queueBufferConfig);
     }
 
     public AmazonSQS createSQSAsync(String accessKey, String secretKey, String region) {//TODO check region is Enum?
@@ -83,8 +80,7 @@ public class SQSFactoryImpl implements SQSFactory {
             sqsAsyncBuilder.withRegion(Regions.valueOf(region));
         }
         final QueueBufferConfig queueBufferConfig = this.getQueueBufferConfig(null);
-        final AmazonSQSBufferedAsyncClient sqsBufferedAsync = new AmazonSQSBufferedAsyncClient(sqsAsyncBuilder.build(), queueBufferConfig);
-        return sqsBufferedAsync;
+        return new AmazonSQSBufferedAsyncClient(sqsAsyncBuilder.build(), queueBufferConfig);
     }
 
     private AmazonSQSAsyncClientBuilder createStandardAsyncClientBuilder(SQSQueue queue, AWSCredentialsProvider credentials) {
@@ -92,7 +88,7 @@ public class SQSFactoryImpl implements SQSFactory {
         AmazonSQSAsyncClientBuilder builder = AmazonSQSAsyncClientBuilder.standard()
             .withClientConfiguration(clientConfiguration)
             .withCredentials(credentials)
-            .withExecutorFactory(this.SQSExecutorFactory);
+            .withExecutorFactory(this.sqsExecutorFactory);
 
         if (queue != null) {
             Regions region = queue.getRegion();
@@ -113,8 +109,7 @@ public class SQSFactoryImpl implements SQSFactory {
     public SQSQueueMonitor createMonitor(final ExecutorService executor, final SQSQueue queue) {
         final AmazonSQS sqs = this.createSQSAsync(queue);
         final SQSChannel channel = new SQSChannelImpl(sqs, queue, this.factory);
-        SQSQueueMonitor monitor = new SQSQueueMonitorImpl(executor, queue, channel);
-        return monitor;
+        return new SQSQueueMonitorImpl(executor, queue, channel);
     }
 
     @Override

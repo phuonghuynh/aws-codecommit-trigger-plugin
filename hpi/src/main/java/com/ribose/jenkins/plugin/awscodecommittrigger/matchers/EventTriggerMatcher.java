@@ -1,4 +1,5 @@
 /*
+ * Copyright 2017 Ribose Inc. <https://www.ribose.com>
  * Copyright 2016 M-Way Solutions GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,19 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.interfaces;
+package com.ribose.jenkins.plugin.awscodecommittrigger.matchers;
 
-public interface SQSExecutorFactory extends com.amazonaws.client.builder.ExecutorFactory {
+import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.Event;
+import com.ribose.jenkins.plugin.awscodecommittrigger.model.job.SQSJob;
+import hudson.model.Job;
+
+import java.util.List;
+
+
+/**
+ * Interface definition for classes that match events to {@link Job}s. If an event
+ * matches a project its build process should be triggered.
+ */
+public interface EventTriggerMatcher {
+    boolean matches(List<Event> events, SQSJob job);
 }

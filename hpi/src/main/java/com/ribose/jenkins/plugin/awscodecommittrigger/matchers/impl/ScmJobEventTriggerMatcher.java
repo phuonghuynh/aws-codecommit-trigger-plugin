@@ -19,8 +19,8 @@ package com.ribose.jenkins.plugin.awscodecommittrigger.matchers.impl;
 import com.ribose.jenkins.plugin.awscodecommittrigger.SQSScmConfig;
 import com.ribose.jenkins.plugin.awscodecommittrigger.SQSTrigger;
 import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.Event;
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.EventTriggerMatcher;
 import com.ribose.jenkins.plugin.awscodecommittrigger.logging.Log;
+import com.ribose.jenkins.plugin.awscodecommittrigger.matchers.EventTriggerMatcher;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.job.SQSJob;
 import hudson.plugins.git.BranchSpec;
 import hudson.plugins.git.GitSCM;
@@ -92,13 +92,9 @@ public class ScmJobEventTriggerMatcher implements EventTriggerMatcher {
             return false;
         }
 
-        if (this.isGitScmAvailable() && this.matchesGitSCM(event, scm)) {
-            return true;
-        } else if (this.isMultiScmAvailable() && this.matchesMultiSCM(event, scm)) {
-            return true;
-        } else {
-            return false;
-        }
+        boolean matched = this.isGitScmAvailable() && this.matchesGitSCM(event, scm); //git matched
+        matched = matched ||  this.isMultiScmAvailable() && this.matchesMultiSCM(event, scm); //multi scm matched
+        return matched;
     }
 
     private boolean matchesGitSCM(final Event event, final SCM scmProvider) {

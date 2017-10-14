@@ -1,5 +1,6 @@
 /*
  * Copyright 2017 Ribose Inc. <https://www.ribose.com>
+ * Copyright 2016 M-Way Solutions GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,35 +15,32 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.matchers;
+package com.ribose.jenkins.plugin.awscodecommittrigger.matchers.impl;
 
 import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.Event;
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.EventTriggerMatcher;
 import com.ribose.jenkins.plugin.awscodecommittrigger.logging.Log;
+import com.ribose.jenkins.plugin.awscodecommittrigger.matchers.EventTriggerMatcher;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.job.SQSJob;
-import org.apache.commons.lang3.ClassUtils;
 
 import java.util.List;
 
 
-public class AndEventTriggerMatcher extends AbstractEventTriggerMatcher {
+public class EventTriggerMatcherImpl implements EventTriggerMatcher {
 
-    private static final Log log = Log.get(AndEventTriggerMatcher.class);
+    private static final Log log = Log.get(EventTriggerMatcherImpl.class);
 
-    public AndEventTriggerMatcher(EventTriggerMatcher... matchers) {
-        super(matchers);
+    private final EventTriggerMatcher delegate;
+
+    public EventTriggerMatcherImpl() {
+        this.delegate = new AndEventTriggerMatcher(
+            new ScmJobEventTriggerMatcher()
+        );
     }
 
     @Override
     public boolean matches(List<Event> events, SQSJob job) {
-        for (EventTriggerMatcher matcher : matchers) {
-            log.debug("Test if any event not match using %s", ClassUtils.getAbbreviatedName(matcher.getClass(), 1));
-            if (!matcher.matches(events, job)) {
-                return false;
-            }
-        }
-
-        log.debug("OK! At least one event matched");
-        return true;
+        boolean match = this.delegate.matches(events, job);
+        log.debug("Finally, events match status is %s", job, match);
+        return match;
     }
 }

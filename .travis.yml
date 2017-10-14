@@ -10,4 +10,8 @@ jdk: [oraclejdk8, oraclejdk7]
 language: java
 
 script:
+  - jdk_switcher use openjdk7
+  - mvn clean compile
+
+  - jdk_switcher use oraclejdk8
   - mvn clean verify -P$TRAVIS_BRANCH

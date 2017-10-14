@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.matchers;
+package com.ribose.jenkins.plugin.awscodecommittrigger.matchers.impl;
 
 import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.Event;
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.EventTriggerMatcher;
 import com.ribose.jenkins.plugin.awscodecommittrigger.logging.Log;
+import com.ribose.jenkins.plugin.awscodecommittrigger.matchers.AbstractEventTriggerMatcher;
+import com.ribose.jenkins.plugin.awscodecommittrigger.matchers.EventTriggerMatcher;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.job.SQSJob;
 import org.apache.commons.lang3.ClassUtils;
 

@@ -15,29 +15,41 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.net;
+package com.ribose.jenkins.plugin.awscodecommittrigger.io.impl;
 
 import com.amazonaws.services.sqs.model.DeleteMessageBatchRequest;
 import com.amazonaws.services.sqs.model.DeleteMessageBatchRequestEntry;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueue;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.RequestFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class RequestFactoryImpl implements RequestFactory {
 
     @Override
     public ReceiveMessageRequest createReceiveMessageRequest(final SQSQueue queue) {
-        final ReceiveMessageRequest request = new ReceiveMessageRequest(queue.getUrl());
-        request.setMaxNumberOfMessages(queue.getMaxNumberOfMessages());
-        request.setWaitTimeSeconds(queue.getWaitTimeSeconds());
+        return createReceiveMessageRequest(queue.getUrl(), queue.getMaxNumberOfMessages(), queue.getWaitTimeSeconds());
+    }
+
+    @Override
+    public ReceiveMessageRequest createReceiveMessageRequest(String queueUrl, final int maxNumberMessages, final int waitTimeSeconds) {
+        final ReceiveMessageRequest request = new ReceiveMessageRequest(queueUrl);
+        request.setMaxNumberOfMessages(maxNumberMessages);
+        request.setWaitTimeSeconds(waitTimeSeconds);
         return request;
     }
 
     @Override
     public DeleteMessageBatchRequest createDeleteMessageBatchRequest(final SQSQueue queue, final List<Message> messages) {
+        return createDeleteMessageBatchRequest(queue.getUrl(), messages);
+    }
+
+    @Override
+    public DeleteMessageBatchRequest createDeleteMessageBatchRequest(String queueUrl, List<Message> messages) {
         final List<DeleteMessageBatchRequestEntry> entries = new ArrayList<>(messages.size());
 
         for (final Message message : messages) {
@@ -45,7 +57,7 @@ public class RequestFactoryImpl implements RequestFactory {
             entries.add(entry);
         }
 
-        final DeleteMessageBatchRequest request = new DeleteMessageBatchRequest(queue.getUrl());
+        final DeleteMessageBatchRequest request = new DeleteMessageBatchRequest(queueUrl);
         request.setEntries(entries);
         return request;
     }

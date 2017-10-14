@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.interfaces;
+package com.ribose.jenkins.plugin.awscodecommittrigger.mornitor;
 
 import com.google.inject.Provider;
 

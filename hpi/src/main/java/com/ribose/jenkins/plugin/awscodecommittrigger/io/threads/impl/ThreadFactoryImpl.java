@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.model.constants;
+package com.ribose.jenkins.plugin.awscodecommittrigger.io.threads.impl;
 
-/**
- * Defines constants for error codes returned by Amazon Web Services (AWS).
- */
-public final class ErrorCode {
+import javax.annotation.Nonnull;
+import java.util.concurrent.ThreadFactory;
 
-    /**
-     * The X.509 certificate or AWS access key ID provided does not exist on AWS.
-     * <p>
-     * HTTP Status Code: 403
-     */
-    public static final String INVALID_CLIENT_TOKEN_ID = "InvalidClientTokenId";
 
-    private ErrorCode() {
+public class ThreadFactoryImpl implements ThreadFactory {
+
+    @Override
+    public Thread newThread(@Nonnull final Runnable r) {
+        final Thread thread = new Thread(r);
+        thread.setPriority(Thread.MIN_PRIORITY);
+        return thread;
     }
 }

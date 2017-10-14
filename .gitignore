@@ -23,3 +23,8 @@ buildNumber.properties
 workflow/
 docker/
 ruby/
+
+AwsFunctionsIT.java
+.circleci/
+Dockerfile-test
+
