@@ -1,5 +1,6 @@
 package com.ribose.jenkins.plugin.awscodecommittrigger.it;
 
+import com.google.common.io.Files;
 import com.ribose.jenkins.plugin.awscodecommittrigger.SQSTrigger;
 import com.ribose.jenkins.plugin.awscodecommittrigger.it.fixture.ProjectFixture;
 import hudson.model.queue.QueueTaskFuture;
@@ -9,6 +10,8 @@ import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class AbstractPipelineIT extends AbstractJenkinsIT {
@@ -27,10 +30,6 @@ public class AbstractPipelineIT extends AbstractJenkinsIT {
         jenkinsRule.assertBuildStatusSuccess(run.get());
 
         resetPipelineBuildEvent(fixture);
-
-        if (!fixture.isHasTrigger()) {
-            return;
-        }
 
         final String uuid = this.sqsQueue.getUuid();
         SQSTrigger trigger = new SQSTrigger(uuid, fixture.isSubscribeInternalScm(), fixture.getScmConfigs());

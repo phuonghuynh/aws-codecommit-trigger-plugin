@@ -80,7 +80,7 @@ public final class StringUtils {
         return value;
     }
 
-    private static String findValueByPatter(String string, Pattern pattern, String groupName) {
+    private static String findValueByPattern(String string, Pattern pattern, String groupName) {
         String value = null;
         final Matcher matcher = pattern.matcher(string);
         if (matcher.matches()) {
@@ -96,7 +96,7 @@ public final class StringUtils {
      * @return the name of queue
      */
     public static String getSqsQueueName(final String queueUrl) {
-        return findValueByPatter(queueUrl, SQS_URL_PATTERN, "name");
+        return findValueByPattern(queueUrl, SQS_URL_PATTERN, "name");
     }
 
     /**
@@ -106,7 +106,7 @@ public final class StringUtils {
      * @return the endpoint of that queue
      */
     public static String getSqsEndpoint(final String queueUrl) {
-        return findValueByPatter(queueUrl, SQS_URL_PATTERN, "endpoint");
+        return findValueByPattern(queueUrl, SQS_URL_PATTERN, "endpoint");
     }
 
     /**
@@ -122,7 +122,7 @@ public final class StringUtils {
     }
 
     public static String getCodeCommitRepoName(String codeCommitUrl) {
-        return findValueByPatter(codeCommitUrl, CODE_COMMIT_PATTERN, "repoName");
+        return findValueByPattern(codeCommitUrl, CODE_COMMIT_PATTERN, "repoName");
     }
 
     public static boolean isCodeCommitRepo(String url) {

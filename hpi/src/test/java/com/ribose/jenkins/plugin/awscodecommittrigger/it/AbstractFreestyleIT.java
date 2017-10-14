@@ -26,11 +26,7 @@ public class AbstractFreestyleIT extends AbstractJenkinsIT {
 
         final String uuid = this.sqsQueue.getUuid();
 
-        SQSTrigger trigger = null;
-
-        if (fixture.isHasTrigger()) {
-            trigger = new SQSTrigger(uuid, fixture.isSubscribeInternalScm(), fixture.getScmConfigs());
-        }
+        SQSTrigger trigger = new SQSTrigger(uuid, fixture.isSubscribeInternalScm(), fixture.getScmConfigs());
 
         final OneShotEvent event = new OneShotEvent();
         job.getBuildersList().add(new TestBuilder() {

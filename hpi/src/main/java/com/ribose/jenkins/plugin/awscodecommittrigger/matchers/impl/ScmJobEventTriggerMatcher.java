@@ -93,7 +93,7 @@ public class ScmJobEventTriggerMatcher implements EventTriggerMatcher {
         }
 
         boolean matched = this.isGitScmAvailable() && this.matchesGitSCM(event, scm); //git matched
-        matched = !matched && this.isMultiScmAvailable() && this.matchesMultiSCM(event, scm); //multi scm matched
+        matched = matched ||  this.isMultiScmAvailable() && this.matchesMultiSCM(event, scm); //multi scm matched
         return matched;
     }
 

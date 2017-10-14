@@ -313,6 +313,6 @@ public class SQSQueueMonitorSchedulerImplTest {
         Mockito.verify(this.monitorA).isShutDown();
         Mockito.verify(this.monitorB).shutDown();
         Mockito.verifyNoMoreInteractions(this.monitorA);
-        Mockito.verifyNoMoreInteractions(this.monitorB);
+        Mockito.verifyNoMoreInteractions(this.monitorB);//327191225
     }
 }

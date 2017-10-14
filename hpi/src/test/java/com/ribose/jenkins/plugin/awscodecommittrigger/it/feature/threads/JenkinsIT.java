@@ -28,7 +28,7 @@ public class JenkinsIT extends AbstractFreestyleIT {
                     .setScm(defaultSCM)
                     .setSendBranches("refs/heads/" + branch)
                     .setSubscribeInternalScm(true)
-                    .setShouldStarted(Boolean.TRUE)
+                    .setShouldStarted(true)
             );
         }
     }
@@ -58,11 +58,7 @@ public class JenkinsIT extends AbstractFreestyleIT {
         threadPool.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
 
         for (ProjectFixture fixture : this.projectFixtures) {
-            Assertions.assertThat(fixture.getEvent()).isNotNull();
-
-            OneShotEvent event = fixture.getEvent();
-            event.block(fixture.getTimeout());
-            Assertions.assertThat(event.isSignaled()).isEqualTo(fixture.getShouldStarted());
+            this.assertFixture(fixture);
         }
     }
 }

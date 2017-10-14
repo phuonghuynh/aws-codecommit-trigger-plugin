@@ -391,26 +391,6 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
             return items;
         }
 
-//        public ComboBoxModel doFillUrlItems(@QueryParameter final String region, @QueryParameter final String credentialsId) throws IOException {
-//            ComboBoxModel items = new ComboBoxModel();
-//            try {
-//                AwsCredentials credentials = AwsCredentialsHelper.getCredentials(credentialsId);
-//                assert credentials != null;
-//
-//                AmazonSQS client = this.sqsFactory.createSQSAsync(credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey(), region);
-//                List<String> queueUrls = client.listQueues().getQueueUrls();
-//                for (String queueUrl : queueUrls) {
-//                    items.add(com.ribose.jenkins.plugin.awscodecommittrigger.utils.StringUtils.getSqsQueueName(queueUrl));
-//                }
-//            } catch (AmazonServiceException e) {//com.amazonaws.SdkClientException: Unable to find a region via the region provider chain. Must provide an explicit region in the builder or setup environment to supply a region.
-//                //TODO detect default Region setting in http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
-//                Stapler.getCurrentResponse().sendError(e.getStatusCode(), e.getErrorMessage());
-//            } catch (Exception e) {//com.amazonaws.services.sqs.model.AmazonSQSException: Access to the resource https://sqs.us-west-2.amazonaws.com/ is denied. (Service: AmazonSQS; Status Code: 403; Error Code: AccessDenied; Request ID: 165762d0-bd84-5b9a-aaaa-308446528a6d)
-//                items.clear();
-//            }
-//            return items;
-//        }
-
         private FormValidation validateNumber(final String value, final int min, final int max, final String message) {
             try {
                 if (StringUtils.isBlank(value)) {

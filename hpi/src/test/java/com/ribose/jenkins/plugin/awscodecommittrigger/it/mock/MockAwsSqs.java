@@ -45,7 +45,7 @@ public class MockAwsSqs {
     private MockAwsSqs() {
     }
 
-    public synchronized void shutdown() {
+    public void shutdown() {
         if (!this.started) {
             throw new IllegalStateException("Server might not started yet");
         }
@@ -71,12 +71,14 @@ public class MockAwsSqs {
         this.started = true;
     }
 
-    public synchronized static MockAwsSqs get() {
-        if (!instance.started) {
-            try {
-                instance.start();
-            } catch (IOException e) {
-                throw new IllegalStateException(e);
+    public static MockAwsSqs get() {
+        synchronized (instance) {
+            if (!instance.started) {
+                try {
+                    instance.start();
+                } catch (IOException e) {
+                    throw new IllegalStateException(e);
+                }
             }
         }
         return instance;
