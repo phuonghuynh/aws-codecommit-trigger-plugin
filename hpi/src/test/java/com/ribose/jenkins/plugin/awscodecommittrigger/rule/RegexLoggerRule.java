@@ -46,4 +46,8 @@ public class RegexLoggerRule extends ExternalResource {
     public List<String> getMessages() {
         return messages;
     }
+
+    public Pattern getRegex() {
+        return regex;
+    }
 }

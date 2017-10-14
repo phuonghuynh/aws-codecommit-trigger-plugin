@@ -5,6 +5,7 @@ import com.ribose.jenkins.plugin.awscodecommittrigger.it.fixture.ProjectFixture;
 import com.ribose.jenkins.plugin.awscodecommittrigger.it.mock.MockAwsSqs;
 import com.ribose.jenkins.plugin.awscodecommittrigger.it.mock.MockContext;
 import com.ribose.jenkins.plugin.awscodecommittrigger.it.mock.MockGitSCM;
+import com.ribose.jenkins.plugin.awscodecommittrigger.matchers.impl.ScmJobEventTriggerMatcher;
 import com.ribose.jenkins.plugin.awscodecommittrigger.rule.RegexLoggerRule;
 import hudson.plugins.git.GitSCM;
 import hudson.util.OneShotEvent;
@@ -37,6 +38,13 @@ public abstract class AbstractJenkinsIT {
         Pattern.compile("(Try to trigger the build for message)"),
         Logger.getLogger(SQSTriggerBuilder.class.getName()),
         Level.INFO
+    ).capture(10);
+
+    @ClassRule
+    public static RegexLoggerRule noEventMatchedLoggerRule = new RegexLoggerRule(
+        Pattern.compile("(No event matched)"),
+        Logger.getLogger(ScmJobEventTriggerMatcher.class.getName()),
+        Level.WARNING
     ).capture(10);
 
     protected MockAwsSqs mockAwsSqs;
@@ -101,9 +109,10 @@ public abstract class AbstractJenkinsIT {
             Assertions.assertThat(event.isSignaled()).as("Job should be started? %s", fixture.getShouldStarted()).isEqualTo(fixture.getShouldStarted());
         } catch (AssertionError e) {
             if (fixture.getShouldStarted()) {
-                Assertions.assertThat(jobScheduledLoggerRule.getMessages()).as("Jenkins Log should has job scheduled log entry").isNotEmpty();
+                Assertions.assertThat(jobScheduledLoggerRule.getMessages()).as("Jenkins Log should has lines match with pattern: %s", jobScheduledLoggerRule.getRegex().pattern()).isNotEmpty();
             }
             else {
+                Assertions.assertThat(noEventMatchedLoggerRule.getMessages()).as("Jenkins Log should has lines match with pattern: %s", noEventMatchedLoggerRule.getRegex().pattern()).isNotEmpty();
                 throw e;
             }
         }
