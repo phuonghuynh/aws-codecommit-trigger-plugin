@@ -309,7 +309,7 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
                 Messages.errorMaxNumberOfMessages());
         }
 
-        //TODO implement https://github.com/riboseinc/aws-codecommit-trigger-plugin/issues/44
+        //TODO move to ACL packages
         public FormValidation doValidate(@QueryParameter final String region,
                                          @QueryParameter final String url,
                                          @QueryParameter final String credentialsId) throws IOException, ServletException {

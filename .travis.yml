@@ -1,15 +1,37 @@
 dist: precise
-sudo: required
+sudo: false
+
+language: java
 
 cache:
   directories:
     - $HOME/.m2
 
-language: java
+jdk:
+  - openjdk7
+  - oraclejdk8
 
 script:
-  - jdk_switcher use openjdk7
   - mvn clean verify
 
-  - jdk_switcher use oraclejdk8
-  - mvn clean verify -P$TRAVIS_BRANCH
+jobs:
+  include:
+    - stage: integration-test
+      jdk: oraclejdk8
+      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.migration.*'
+
+    - stage: integration-test
+      jdk: oraclejdk8
+      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.pipeline.*'
+
+    - stage: integration-test
+      jdk: oraclejdk8
+      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.scmconfig.*'
+
+    - stage: integration-test
+      jdk: oraclejdk8
+      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.subscribed_branch.*'
+
+    - stage: integration-test
+      jdk: oraclejdk8
+      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.threads.*'

@@ -25,6 +25,5 @@ docker/
 ruby/
 
 AwsFunctionsIT.java
+Dockerfile.test
 .circleci/
-Dockerfile-test
-

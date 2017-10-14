@@ -195,27 +195,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!--org.jenkins-ci.tools:maven-hpi-plugin:2.1:list-plugin-dependencies-->
-            <!--<plugin>-->
-                <!--<groupId>org.jenkins-ci.tools</groupId>-->
-                <!--<artifactId>maven-hpi-plugin</artifactId>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>list-plugin-dependencies</id>-->
-                        <!--<goals>-->
-                            <!--<goal>list-plugin-dependencies</goal>-->
-                        <!--</goals>-->
-                        <!--<configuration>-->
-                            <!--<dependentWarExcludes></dependentWarExcludes>-->
-                        <!--</configuration>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-                <!--<version>2.1</version>-->
-                <!--<configuration>-->
-                    <!--<dependentWarExcludes></dependentWarExcludes>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
         </plugins>
     </build>
 
