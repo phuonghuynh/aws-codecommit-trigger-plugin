@@ -21,7 +21,8 @@ public class MockContext extends com.google.inject.AbstractModule {
     }
 
     public static InternalInjector getInjector() {
-        InternalInjector inject = Jenkins.getActiveInstance().lookup.get(InternalInjector.class);
+        Jenkins jenkins = Jenkins.getInstance();
+        InternalInjector inject = jenkins == null ? new InternalInjector(): jenkins.lookup.get(InternalInjector.class);
         Module module = Modules.override(inject.getModule()).with(new MockContext());
         inject.setModule(module);
         return inject;

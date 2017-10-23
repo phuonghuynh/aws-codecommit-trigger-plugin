@@ -75,7 +75,6 @@ public class ScmJobEventTriggerMatcher implements EventTriggerMatcher {
             }
 
             for (Event event : events) {
-                log.debug("Matching event %s with SCM %s", event, scm.getKey());
                 if (this.matches(event, scm)) {
                     log.debug("Hurray! Event %s matched SCM %s", job, event.getArn(), scm.getKey());
                     return true;
@@ -138,12 +137,12 @@ public class ScmJobEventTriggerMatcher implements EventTriggerMatcher {
     private boolean matchBranch(final Event event, final List<BranchSpec> branchSpecs) {//TODO use it
         for (BranchSpec branchSpec : branchSpecs) {
             if (branchSpec.matches(event.getBranch())) {
-                log.debug("Event %s matched branch %s", event.getArn(), branchSpec.getName());
+                log.debug("Event arn=%s matched branch name=%s", event.getArn(), branchSpec.getName());
                 return true;
             }
         }
 
-        log.debug("Found no event matched any branch", event.getArn());
+        log.debug("Found no event matched any branch arn=%s", event.getArn());
         return false;
     }
 
@@ -155,12 +154,12 @@ public class ScmJobEventTriggerMatcher implements EventTriggerMatcher {
         List<URIish> uris = config.getURIs();
         for (final URIish uri : uris) {
             if (event.isMatch(uri)) {//TODO use here matchBranch(event, branchSpec)
-                log.debug("Event %s matched uri %s", event.getArn(), uri);
+                log.debug("Event arn=%s matched uri=%s", event.getArn(), uri);
                 return uri;
             }
         }
 
-        log.debug("Found no event matched config: ", event.getArn(), config.getName());
+        log.debug("Found no event arn=%s matched config name=%s ", event.getArn(), config.getName());
         return null;
     }
 

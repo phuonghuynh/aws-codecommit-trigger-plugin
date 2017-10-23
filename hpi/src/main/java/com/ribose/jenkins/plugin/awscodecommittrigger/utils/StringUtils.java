@@ -17,7 +17,9 @@
 package com.ribose.jenkins.plugin.awscodecommittrigger.utils;
 
 
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.model.Message;
+import org.apache.commons.lang3.EnumUtils;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -31,8 +33,7 @@ import java.util.regex.Pattern;
 
 public final class StringUtils {
 
-    public static final Pattern SQS_URL_PATTERN = Pattern
-        .compile("^(?:http(?:s)?://)?(?<endpoint>sqs\\..+?\\.amazonaws\\.com)/(?<id>.+?)/(?<name>.*)$");
+    public static final Pattern SQS_URL_PATTERN = Pattern.compile("^(?:http(?:s)?://)?(?<endpoint>sqs\\.(?<region>.+?)\\.amazonaws\\.com)/(?<id>.+?)/(?<name>.*)$");
 
     public static final Pattern CODE_COMMIT_PATTERN = Pattern.compile("^(?:(https|ssh)?://)?(?<endpoint>git-codecommit\\..+?\\.amazonaws\\.com)/(?<version>.+?)/repos/(?<repoName>.*)$");
 
@@ -80,7 +81,7 @@ public final class StringUtils {
         return value;
     }
 
-    private static String findValueByPattern(String string, Pattern pattern, String groupName) {
+    public static String findValueByPattern(String string, Pattern pattern, String groupName) {
         String value = null;
         final Matcher matcher = pattern.matcher(string);
         if (matcher.matches()) {
@@ -107,6 +108,19 @@ public final class StringUtils {
      */
     public static String getSqsEndpoint(final String queueUrl) {
         return findValueByPattern(queueUrl, SQS_URL_PATTERN, "endpoint");
+    }
+
+    @CheckForNull
+    public static Regions getSqsRegion(String queueUrl) {
+        String region = findValueByPattern(queueUrl, SQS_URL_PATTERN, "region");
+        if (region == null) {
+            return null;
+        }
+        return parseRegions(region);
+    }
+
+    public static Regions parseRegions(String region) {
+        return EnumUtils.isValidEnum(Regions.class, region) ? Regions.valueOf(region) : Regions.fromName(region);
     }
 
     /**
@@ -153,10 +167,10 @@ public final class StringUtils {
             int sourcev = Integer.parseInt(source.group());
 
             if (destv > sourcev) {
-                compatible = false;
+                compatible = Boolean.FALSE;
             }
             else if (destv <= sourcev) {
-                compatible = true;
+                compatible = Boolean.TRUE;
             }
         }
 

@@ -17,8 +17,7 @@
 
 package com.ribose.jenkins.plugin.awscodecommittrigger.io.impl;
 
-import com.amazonaws.ClientConfiguration;
-import com.amazonaws.PredefinedClientConfigurations;
+import com.amazonaws.*;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -28,7 +27,11 @@ import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
 import com.amazonaws.services.sqs.buffered.AmazonSQSBufferedAsyncClient;
 import com.amazonaws.services.sqs.buffered.QueueBufferConfig;
+import com.amazonaws.services.sqs.model.*;
 import com.google.inject.Inject;
+import com.ribose.jenkins.plugin.awscodecommittrigger.SQSTriggerQueue;
+import com.ribose.jenkins.plugin.awscodecommittrigger.credentials.AwsCredentials;
+import com.ribose.jenkins.plugin.awscodecommittrigger.credentials.AwsCredentialsHelper;
 import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueue;
 import com.ribose.jenkins.plugin.awscodecommittrigger.io.RequestFactory;
 import com.ribose.jenkins.plugin.awscodecommittrigger.io.SQSChannel;
@@ -38,25 +41,32 @@ import com.ribose.jenkins.plugin.awscodecommittrigger.logging.Log;
 import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.SQSQueueMonitor;
 import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.impl.SQSQueueMonitorImpl;
 import hudson.ProxyConfiguration;
+import hudson.util.FormValidation;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.EnumUtils;
+import org.apache.http.HttpStatus;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 public class SQSFactoryImpl implements SQSFactory {
 
     private static final Log log = Log.get(SQSFactoryImpl.class);
 
-    private final RequestFactory factory;
+    private final RequestFactory requestFactory;
     private final SQSExecutorFactory sqsExecutorFactory;
 
     @Inject
-    public SQSFactoryImpl(final SQSExecutorFactory sqsExecutorFactory, final RequestFactory factory) {
+    public SQSFactoryImpl(final SQSExecutorFactory sqsExecutorFactory, final RequestFactory requestFactory) {
         this.sqsExecutorFactory = sqsExecutorFactory;
-        this.factory = factory;
+        this.requestFactory = requestFactory;
     }
 
     @Override
@@ -74,10 +84,11 @@ public class SQSFactoryImpl implements SQSFactory {
         return new AmazonSQSBufferedAsyncClient(sqsAsyncBuilder.build(), queueBufferConfig);
     }
 
-    public AmazonSQS createSQSAsync(String accessKey, String secretKey, String region) {//TODO check region is Enum?
+    @Override
+    public AmazonSQS createSQSAsync(String accessKey, String secretKey, Regions region) {
         AmazonSQSAsyncClientBuilder sqsAsyncBuilder = createStandardAsyncClientBuilder(null, new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)));
-        if (StringUtils.isNotBlank(region)) {
-            sqsAsyncBuilder.withRegion(Regions.valueOf(region));
+        if (region != null) {
+            sqsAsyncBuilder.withRegion(region);
         }
         final QueueBufferConfig queueBufferConfig = this.getQueueBufferConfig(null);
         return new AmazonSQSBufferedAsyncClient(sqsAsyncBuilder.build(), queueBufferConfig);
@@ -102,13 +113,13 @@ public class SQSFactoryImpl implements SQSFactory {
 
     private SQSChannel createChannel(final SQSQueue queue) {
         final AmazonSQS sqs = this.createSQSAsync(queue);
-        return new SQSChannelImpl(sqs, queue, this.factory);
+        return new SQSChannelImpl(sqs, queue, this.requestFactory);
     }
 
     @Override
     public SQSQueueMonitor createMonitor(final ExecutorService executor, final SQSQueue queue) {
         final AmazonSQS sqs = this.createSQSAsync(queue);
-        final SQSChannel channel = new SQSChannelImpl(sqs, queue, this.factory);
+        final SQSChannel channel = new SQSChannelImpl(sqs, queue, this.requestFactory);
         return new SQSQueueMonitorImpl(executor, queue, channel);
     }
 
@@ -130,6 +141,7 @@ public class SQSFactoryImpl implements SQSFactory {
         return getClientConfiguration(proxy);
     }
 
+    @Override
     public ClientConfiguration getClientConfiguration(final Proxy proxy) {
         ClientConfiguration config = PredefinedClientConfigurations.defaultConfig();
 
@@ -149,6 +161,81 @@ public class SQSFactoryImpl implements SQSFactory {
             log.debug("Proxy settings for SQS: %s:%s", config.getProxyHost(), config.getProxyPort());
         }
         return config;
+    }
+
+    @Override
+    public boolean hasSufficientPermissions(@Nonnull String url, @Nonnull String credentialsId) {
+
+//        if (org.apache.commons.lang3.StringUtils.isBlank(credentialsId)) {
+//            return false;
+//        }
+
+//        String endpoint = com.ribose.jenkins.plugin.awscodecommittrigger.utils.StringUtils.getSqsEndpoint(url);
+//        if (StringUtils.isEmpty(endpoint)) {
+//            return false;
+//        }
+
+        AwsCredentials credentials = AwsCredentialsHelper.getCredentials(credentialsId);
+        if (credentials == null) {
+            return false;
+        }
+
+        String queueUrl = org.apache.commons.lang3.StringUtils.trimToEmpty(url);
+        Regions region = com.ribose.jenkins.plugin.awscodecommittrigger.utils.StringUtils.getSqsRegion(url);
+        if (region == null) {
+            return false;
+        }
+
+//        if (org.apache.commons.lang3.StringUtils.isEmpty(region)) {
+//            return FormValidation.error(String.format("Region not found from Queue: %s", url));
+//        }
+
+        AmazonSQS client = createSQSAsync(credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey(), region);
+
+        try {
+            AmazonWebServiceRequest request = this.requestFactory.createReceiveMessageRequest(queueUrl);
+            client.receiveMessage((ReceiveMessageRequest) request);
+
+            request = this.requestFactory.createDeleteMessageBatchRequest(queueUrl, Collections.singletonList(new Message()));
+            client.deleteMessageBatch((DeleteMessageBatchRequest) request);
+        }
+        catch (EmptyBatchRequestException e) {
+            return true;
+//            return FormValidation.okWithMarkup("<span class=\"info\">Access to SQS successful</span>");
+        }
+        catch (Exception e) {
+//            return FormValidation.error(e, "Error validating SQS access");
+            log.debug("Error validating SQS access", e);
+//            return false;
+        }
+        finally {
+            client.shutdown();
+        }
+
+        return false;
+    }
+
+    @CheckForNull
+    @Override
+    public List<String> getListQueues(@Nonnull String credentialsId, @Nonnull Regions region) {
+        AwsCredentials credentials = AwsCredentialsHelper.getCredentials(credentialsId);
+        if (credentials == null) {
+            return null;
+        }
+
+        AmazonSQS client = createSQSAsync(credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey(), region);
+
+        try {
+            return client.listQueues().getQueueUrls();
+        }
+        catch (Exception e) {
+            log.debug("Error listing SQS access", e);
+        }
+        finally {
+            client.shutdown();
+        }
+
+        return null;
     }
 
     //@param queue might be null

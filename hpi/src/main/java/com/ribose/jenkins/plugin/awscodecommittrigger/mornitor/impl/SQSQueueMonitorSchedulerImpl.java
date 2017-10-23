@@ -149,7 +149,7 @@ public class SQSQueueMonitorSchedulerImpl implements SQSQueueMonitorScheduler {
 
             return changed;
         } catch (Exception e) {
-            log.warning("Cannot compare queues: %s, error: %s", e.getMessage(), e);
+            log.warning("Cannot compare queues", e);
         }
         return true;
     }

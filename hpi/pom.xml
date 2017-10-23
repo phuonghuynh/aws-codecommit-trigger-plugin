@@ -202,12 +202,6 @@
         <profile>
             <!-- for running integration test if needed, disabled by default -->
             <id>it</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
             <properties>
                 <java.level>8</java.level>
             </properties>

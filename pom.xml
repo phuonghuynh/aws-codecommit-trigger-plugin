@@ -244,7 +244,7 @@
                         <versionTagPrefix>v</versionTagPrefix>
                     </gitFlowConfig>
                     <releaseFinish>
-                        <preProductionMergeGoals>clean install deploy:deploy</preProductionMergeGoals>
+                        <preProductionMergeGoals>clean install deploy:deploy -Pit</preProductionMergeGoals>
                     </releaseFinish>
                 </configuration>
             </plugin>

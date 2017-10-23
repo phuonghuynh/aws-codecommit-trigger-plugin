@@ -33,7 +33,7 @@ public class RegexLoggerRule extends ExternalResource {
                 String message = f.formatMessage(record);
                 if (RegexLoggerRule.this.regex.matcher(message).find()) {
                     Throwable x = record.getThrown();
-                    messages.add(message == null && x != null ? x.toString() : message);
+                    messages.add(x != null ? x.toString() : message);
                     super.publish(record);
                 }
             }

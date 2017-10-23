@@ -31,10 +31,6 @@ public class AwsCredentialsHelper {
 
     @CheckForNull
     public static AwsCredentials getCredentials(@NotNull String accessKey, @NotNull Secret secretKey) {
-        if (StringUtils.isBlank(accessKey) || StringUtils.isBlank(secretKey.getPlainText())) {
-            return null;
-        }
-
         return CredentialsMatchers.firstOrNull(
             CredentialsProvider.lookupCredentials(AwsCredentials.class, (Item) null, ACL.SYSTEM, null, null),
             CredentialsMatchers.allOf(

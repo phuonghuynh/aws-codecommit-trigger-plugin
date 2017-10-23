@@ -30,6 +30,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
+//TODO fix this class not thread-safe
 public class SQSQueueMonitorImpl implements SQSQueueMonitor {
 
     private final static Log log = Log.get(SQSQueueMonitorImpl.class);
@@ -42,7 +43,7 @@ public class SQSQueueMonitorImpl implements SQSQueueMonitor {
     private final List<SQSQueueListener> listeners;
 
     private final AtomicBoolean isRunning = new AtomicBoolean();
-    private volatile boolean isShutDown;
+    private volatile AtomicBoolean isShutDown = new AtomicBoolean();;
 
     public SQSQueueMonitorImpl(final ExecutorService executor, final SQSQueue queue, final SQSChannel channel) {
         this.executor = executor;
@@ -71,7 +72,8 @@ public class SQSQueueMonitorImpl implements SQSQueueMonitor {
 
         synchronized (this.listenersLock) {
             if (this.listeners.add(listener) && this.listeners.size() == 1) {
-                this.isShutDown = false;
+//                this.isShutDown = false;
+                this.isShutDown.set(false);
                 this.execute();
                 return true;
             }
@@ -97,7 +99,7 @@ public class SQSQueueMonitorImpl implements SQSQueueMonitor {
     @Override
     public void run() {
         try {
-            if (this.isShutDown) {
+            if (this.isShutDown.get()) {
                 return;
             }
 
@@ -109,8 +111,9 @@ public class SQSQueueMonitorImpl implements SQSQueueMonitor {
             log.debug("Start monitor for %s", this.queue);
             this.processMessages();
         } catch (Exception e) {
-            log.warning("Monitor for %s stopped, error: %s", this.queue, e);
-            this.isShutDown = true;
+//            this.isShutDown = true;
+            this.isShutDown.set(true);
+            log.warning("Monitor for %s stopped, channel: %s", e, this.queue, this.channel);
         } finally {
             if (!this.isRunning.compareAndSet(true, false)) {
                 log.warning("Monitor for %s already stopped", this.queue);
@@ -121,13 +124,15 @@ public class SQSQueueMonitorImpl implements SQSQueueMonitor {
 
     @Override
     public void shutDown() {
+//        this.isShutDown = true;
+        this.isShutDown.set(true);
         log.debug("Shut down monitor for %s", this.channel);
-        this.isShutDown = true;
     }
 
     @Override
     public boolean isShutDown() {
-        return this.isShutDown;
+//        return this.isShutDown;
+        return this.isShutDown.get();
     }
 
     @Override
@@ -141,13 +146,15 @@ public class SQSQueueMonitorImpl implements SQSQueueMonitor {
     }
 
     private void execute() {
-        if (!this.isShutDown) {
+//        if (!this.isShutDown) {
+        if (!this.isShutDown.get()) {
             this.executor.execute(this);
         }
     }
 
     private void processMessages() {
-        if (this.isShutDown) {
+//        if (this.isShutDown) {
+        if (this.isShutDown.get()) {
             return;
         }
 

@@ -17,6 +17,7 @@
 
 package com.ribose.jenkins.plugin.awscodecommittrigger;
 
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.model.Message;
 import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
@@ -49,6 +50,7 @@ import hudson.util.ListBoxModel;
 import hudson.util.Secret;
 import hudson.util.SequentialExecutionQueue;
 import jenkins.model.Jenkins;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
@@ -64,6 +66,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.ribose.jenkins.plugin.awscodecommittrigger.PluginInfo.compatibleSinceVersion;
 
@@ -203,7 +207,7 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
                     new SQSTriggerBuilder(SQSTrigger.this.sqsJob, message).run();
                 } catch (Exception e) {
                     UnexpectedException error = new UnexpectedException(e);
-                    SQSTrigger.log.error("Unable to execute job for this message %s, cause: %s", SQSTrigger.this.job, message.getMessageId(), error);
+                    SQSTrigger.log.error("Unable to execute job for this message %s", SQSTrigger.this.job, error, message.getMessageId());
                     throw error;
                 }
             }
@@ -341,6 +345,38 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
                 String key = json.keys().next().toString();
                 sqsQueues = json.getJSONObject(key).get("sqsQueues");
             }
+
+            //TODO refactor this, url might be in array list
+            JSONArray sqsQueuesArray = new JSONArray();
+            if (sqsQueues instanceof JSONObject) {
+                sqsQueuesArray.add(sqsQueues);
+            }
+            else if (sqsQueues instanceof JSONArray) {
+                sqsQueuesArray = (JSONArray) sqsQueues;
+            }
+
+            for (Object queue : sqsQueuesArray) {
+                JSONObject queueJson = (JSONObject)queue;
+                JSONArray urls = queueJson.getJSONArray("url");
+
+                String url = urls.getString(queueJson.getInt("urlInputIndex"));
+                queueJson.put("url", url);
+//                queueJson.remove("urlInputIndex");
+
+                Regions region = com.ribose.jenkins.plugin.awscodecommittrigger.utils.StringUtils.getSqsRegion(url);
+                if (region == null) {
+                    IllegalArgumentException error = new IllegalArgumentException(String.format("Unable to get Region from Queue Url %s", url));
+                    log.error("Saving aborted!", error);
+                    return false;
+                }
+                queueJson.put("region", region.name());
+            }
+
+            sqsQueues = sqsQueuesArray;
+            if (sqsQueuesArray.size() == 1) {
+                sqsQueues = sqsQueuesArray.get(0);
+            }
+
             this.sqsQueues = req.bindJSONToList(SQSTriggerQueue.class, sqsQueues);
             this.initQueueMap();
 
@@ -418,31 +454,33 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
             int originalSize = globalCredentials.size();
 
             for (SQSTriggerQueue sqsQueue : this.sqsQueues) {
-                if (!sqsQueue.isCompatible()) {
-                    final String accessKey = sqsQueue.getAccessKey();
-                    final Secret secretKey = sqsQueue.getSecretKey();
-
-                    StandardAwsCredentials credential = (StandardAwsCredentials) CollectionUtils.find(globalCredentials, new Predicate() {
-
-                        @Override
-                        public boolean evaluate(Object o) {
-                            if (!StandardAwsCredentials.class.isInstance(o)) {
-                                return false;
-                            }
-
-                            StandardAwsCredentials c = StandardAwsCredentials.class.cast(o);
-                            return c.getAccessKey().equals(accessKey) && c.getSecretKey().equals(secretKey);
-                        }
-                    });
-
-                    if (credential == null) {
-                        credential = new StandardAwsCredentials("imported", accessKey, secretKey);
-                        globalCredentials.add(credential);
-                    }
-
-                    sqsQueue.setCredentialsId(credential.getId());
-                    sqsQueue.setVersion(com.ribose.jenkins.plugin.awscodecommittrigger.PluginInfo.version);
+                if (sqsQueue.isCompatible()) {
+                    continue;
                 }
+
+                final String accessKey = sqsQueue.getAccessKey();
+                final Secret secretKey = sqsQueue.getSecretKey();
+
+                StandardAwsCredentials credential = (StandardAwsCredentials) CollectionUtils.find(globalCredentials, new Predicate() {
+
+                    @Override
+                    public boolean evaluate(Object o) {
+                        if (!StandardAwsCredentials.class.isInstance(o)) {
+                            return false;
+                        }
+
+                        StandardAwsCredentials c = StandardAwsCredentials.class.cast(o);
+                        return c.getAccessKey().equals(accessKey) && c.getSecretKey().equals(secretKey);
+                    }
+                });
+
+                if (credential == null) {
+                    credential = new StandardAwsCredentials("imported", accessKey, secretKey);
+                    globalCredentials.add(credential);
+                }
+
+                sqsQueue.setCredentialsId(credential.getId());
+                sqsQueue.setVersion(com.ribose.jenkins.plugin.awscodecommittrigger.PluginInfo.version);
             }
 
             if (originalSize < globalCredentials.size()) {//save new credentials added

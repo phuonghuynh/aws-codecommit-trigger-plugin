@@ -13,7 +13,7 @@ public class SQSQueueProviderImpl implements SQSQueueProvider {
 
     @Override
     public List<? extends SQSQueue> getSqsQueues() {
-        final SQSTrigger.DescriptorImpl descriptor = (SQSTrigger.DescriptorImpl) Jenkins.getActiveInstance().getDescriptor(SQSTrigger.class);//SQSTrigger.DescriptorImpl.get();
+        final SQSTrigger.DescriptorImpl descriptor = (SQSTrigger.DescriptorImpl) Jenkins.getActiveInstance().getDescriptor(SQSTrigger.class);// SQSTrigger.DescriptorImpl.get();
         return descriptor != null ? descriptor.getSqsQueues() : null;
     }
 

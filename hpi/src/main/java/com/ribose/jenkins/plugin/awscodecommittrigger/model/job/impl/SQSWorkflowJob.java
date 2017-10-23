@@ -10,6 +10,7 @@ import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import java.util.Arrays;
 import java.util.List;
 
+
 public class SQSWorkflowJob extends AbstractSQSJob {
 
     private final WorkflowJob job;

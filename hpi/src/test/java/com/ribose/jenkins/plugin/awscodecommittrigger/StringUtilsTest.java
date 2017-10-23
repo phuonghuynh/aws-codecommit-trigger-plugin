@@ -16,6 +16,7 @@
 
 package com.ribose.jenkins.plugin.awscodecommittrigger;
 
+import com.amazonaws.regions.Regions;
 import com.ribose.jenkins.plugin.awscodecommittrigger.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ClassUtils;
@@ -101,5 +102,16 @@ public class StringUtilsTest {
         Assertions.assertThat(StringUtils.checkCompatibility("1.16", "2.0")).isFalse();
         Assertions.assertThat(StringUtils.checkCompatibility("1.16", "1.15")).isTrue();
         Assertions.assertThat(StringUtils.checkCompatibility("2.0-SNAPSHOT", "2.0")).isTrue();
+    }
+
+    @Test
+    public void testParseSqsUrl() {//https://git-codecommit.us-west-2.amazonaws.com/v1/repos/testjenkins
+        String url = "https://sqs.us-west-2.amazonaws.com/239062223385/testjenkinssqs";
+        Assertions.assertThat(StringUtils.getSqsRegion(url)).isEqualByComparingTo(Regions.US_WEST_2);
+        Assertions.assertThat(StringUtils.getSqsEndpoint(url)).isEqualToIgnoringCase("sqs.us-west-2.amazonaws.com");
+        Assertions.assertThat(StringUtils.getSqsQueueName(url)).isEqualToIgnoringCase("testjenkinssqs");
+
+        url = "https://google.com";
+        Assertions.assertThat(StringUtils.getSqsRegion(url)).isNull();
     }
 }

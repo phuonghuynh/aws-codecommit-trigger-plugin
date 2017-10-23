@@ -16,6 +16,7 @@
 
 package com.ribose.jenkins.plugin.awscodecommittrigger.io.impl;
 
+import com.amazonaws.AbortedException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.*;
@@ -99,7 +100,7 @@ public class SQSChannelImpl implements SQSChannel {
             log.debug("Send request to delete messages from queue %s", this.queue);
             return this.sqs.deleteMessageBatch(request);
         } catch (AmazonServiceException e) {
-            log.warning("Unable delete messages from queue %s, error: %s", this.queue, e);
+            log.warning("Unable delete messages from queue %s", e, this.queue);
         }
         return null;
     }

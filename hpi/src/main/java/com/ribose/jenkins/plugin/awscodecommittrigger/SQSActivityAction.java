@@ -40,7 +40,7 @@ public class SQSActivityAction implements Action {
             log.error("Unable to create trigger activity dir %s", this.activityDir.getPath());
         }
 
-        log.debug("Activity dir %s is writeable? %s", this.activityDir.getPath(), this.activityDir.canWrite());
+        log.debug("Activity dir %s is write-able? %s", this.activityDir.getPath(), this.activityDir.canWrite());
     }
 
     @Override

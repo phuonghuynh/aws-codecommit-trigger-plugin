@@ -2,10 +2,7 @@ package com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.threads;
 
 import com.ribose.jenkins.plugin.awscodecommittrigger.it.AbstractFreestyleIT;
 import com.ribose.jenkins.plugin.awscodecommittrigger.it.fixture.ProjectFixture;
-import hudson.util.OneShotEvent;
-import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 
 public class JenkinsIT extends AbstractFreestyleIT {
 
-    @Parameterized.Parameter(1)
     public List<ProjectFixture> projectFixtures;
 
     public JenkinsIT() {
