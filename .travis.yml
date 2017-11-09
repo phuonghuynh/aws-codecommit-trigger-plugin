@@ -1,8 +1,5 @@
-dist: precise
-sudo: false
-
 language: java
-
+sudo: false
 cache:
   directories:
     - $HOME/.m2
@@ -18,25 +15,25 @@ jobs:
   include:
     - stage: integration-test
       jdk: oraclejdk8
-      env: test=migration
-      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.migration.*'
+      env: spec=migration.*
+      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.migration.*' -Ptravis
 
     - stage: integration-test
       jdk: oraclejdk8
-      env: test=pipeline
-      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.pipeline.*'
+      env: spec=pipeline.*
+      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.pipeline.*' -Ptravis
 
     - stage: integration-test
       jdk: oraclejdk8
-      env: test=scmconfig
-      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.scmconfig.*'
+      env: spec=scmconfig.*
+      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.scmconfig.*' -Ptravis
 
     - stage: integration-test
       jdk: oraclejdk8
-      env: test=subscribed_branch
-      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.subscribed_branch.*'
+      env: spec=subscribed_branch.*
+      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.subscribed_branch.*' -Ptravis
 
     - stage: integration-test
       jdk: oraclejdk8
-      env: test=threads
-      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.threads.*'
+      env: spec=threads.*
+      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.threads.*' -Ptravis
