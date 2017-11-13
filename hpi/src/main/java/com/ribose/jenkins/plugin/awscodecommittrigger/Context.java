@@ -50,7 +50,7 @@ public class Context extends com.google.inject.AbstractModule {
     private static Injector injector;
 
     public synchronized static Injector injector() {
-        Jenkins jenkins = Jenkins.getInstance();//TODO optimize this code
+        Jenkins jenkins = Jenkins.getInstance();
         if (jenkins != null) {
             InternalInjector internalInjector = jenkins.lookup.setIfNull(InternalInjector.class, new InternalInjector());
             injector = internalInjector.resolve();

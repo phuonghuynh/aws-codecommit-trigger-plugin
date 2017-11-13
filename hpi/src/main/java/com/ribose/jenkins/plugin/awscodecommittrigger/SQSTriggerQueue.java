@@ -75,7 +75,7 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
 
     @DataBoundConstructor
     public SQSTriggerQueue(final String uuid,
-                           final String region,//TODO remove later
+                           final String region,
                            final String url,
                            final String credentialsId,
                            final Integer waitTimeSeconds,
@@ -312,7 +312,7 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
 
         public DescriptorImpl() {
             super();
-            this.sqsFactory = Context.injector().getBinding(SQSFactory.class).getProvider().get();//TODO remove injector()
+            this.sqsFactory = Context.injector().getBinding(SQSFactory.class).getProvider().get();
 //            this.requestFactory = Context.injector().getBinding(RequestFactory.class).getProvider().get();
             this.load();
         }

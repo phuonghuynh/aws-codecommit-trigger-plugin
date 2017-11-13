@@ -41,7 +41,7 @@ public class ScmJobEventTriggerMatcher implements EventTriggerMatcher {
     private static final Log log = Log.get(ScmJobEventTriggerMatcher.class);
 
     @Override
-    public boolean matches(List<Event> events, SQSJob job) {//TODO load scm list
+    public boolean matches(List<Event> events, SQSJob job) {
         SQSTrigger trigger = job.getTrigger();
         List<SQSScmConfig> scmConfigs = new ArrayList<>();
 
@@ -134,7 +134,7 @@ public class ScmJobEventTriggerMatcher implements EventTriggerMatcher {
         return false;
     }
 
-    private boolean matchBranch(final Event event, final List<BranchSpec> branchSpecs) {//TODO use it
+    private boolean matchBranch(final Event event, final List<BranchSpec> branchSpecs) {
         for (BranchSpec branchSpec : branchSpecs) {
             if (branchSpec.matches(event.getBranch())) {
                 log.debug("Event arn=%s matched branch name=%s", event.getArn(), branchSpec.getName());
@@ -153,7 +153,7 @@ public class ScmJobEventTriggerMatcher implements EventTriggerMatcher {
     private URIish getMatchesConfig(final Event event, final RemoteConfig config) {
         List<URIish> uris = config.getURIs();
         for (final URIish uri : uris) {
-            if (event.isMatch(uri)) {//TODO use here matchBranch(event, branchSpec)
+            if (event.isMatch(uri)) {
                 log.debug("Event arn=%s matched uri=%s", event.getArn(), uri);
                 return uri;
             }

@@ -1,12 +1,16 @@
 = AWS CodeCommit Trigger Plugin
 
 
+image:https://img.shields.io/:license-apache-blue.svg?style=flat-square[link=https://www.apache.org/licenses/LICENSE-2.0.html]
 image:https://img.shields.io/travis/jenkinsci/aws-codecommit-trigger-plugin.svg?style=flat-square[link=https://travis-ci.org/jenkinsci/aws-codecommit-trigger-plugin]
 image:http://hits.dwyl.io/jenkinsci/aws-codecommit-trigger-plugin.svg[link=http://hits.dwyl.io/jenkinsci/aws-codecommit-trigger-plugin]
-image:https://img.shields.io/:license-apache-blue.svg?style=flat-square[link=https://www.apache.org/licenses/LICENSE-2.0.html]
 
 
 == Introduction
+
+https://img.shields.io/travis/USER/REPO.svg
+
+https://img.shields.io/ci.jenkins.io/buildStatus/icon?job=Plugins/aws-codecommit-trigger-plugin/master
 
 A Jenkins plugin that triggers jobs on repo update events by AWS
 CodeCommit, through the AWS Simple Queue Service (SQS) and Simple

@@ -130,7 +130,6 @@ public class SQSFactoryImpl implements SQSFactory {
     }
 
     private ClientConfiguration getClientConfiguration(@Nullable final SQSQueue queue) {
-        //TODO review proxy configuration
         ProxyConfiguration proxyConfig = Jenkins.getActiveInstance().proxy;
 
         String proxyUrl = queue == null ?
@@ -150,7 +149,7 @@ public class SQSFactoryImpl implements SQSFactory {
             InetSocketAddress address = (InetSocketAddress) proxy.address();
             config.setProxyHost(address.getHostName());
             config.setProxyPort(address.getPort());
-//            config.setNonProxyHosts("169.254.169.254");//TODO
+//            config.setNonProxyHosts("169.254.169.254");
 
             ProxyConfiguration proxyConfig = Jenkins.getActiveInstance().proxy;
             if (StringUtils.isNotBlank(proxyConfig.getUserName())) {

@@ -45,10 +45,7 @@ import hudson.model.Job;
 import hudson.security.AccessDeniedException2;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
-import hudson.util.FormValidation;
-import hudson.util.ListBoxModel;
-import hudson.util.Secret;
-import hudson.util.SequentialExecutionQueue;
+import hudson.util.*;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -63,11 +60,14 @@ import org.kohsuke.stapler.StaplerRequest;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
 
 import static com.ribose.jenkins.plugin.awscodecommittrigger.PluginInfo.compatibleSinceVersion;
 
@@ -107,12 +107,22 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
 
     public Collection<? extends Action> getProjectActions() {
         if (this.job != null && CollectionUtils.isEmpty(this.actions)) {
-            this.actions = Collections.singletonList(new SQSActivityAction(this.job));
+            SQSActivityAction action = new SQSActivityAction(this.job);
+            try {
+                StreamTaskListener task = new StreamTaskListener(action.getActivityLogFile(), true, Charset.forName("UTF-8"));
+                StreamHandler handler = new StreamHandler(task.getLogger(), new SimpleFormatter());
+                Log.addHandler(handler);
+            } catch (IOException e) {
+                log.debug("Unable to log activities", e);
+            }
+
+            this.actions = Collections.singletonList(action);
         }
 
         if (this.actions == null) {
             this.actions = Collections.emptyList();
         }
+
         return this.actions;
     }
 
@@ -122,6 +132,7 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
         this.sqsJob = this.sqsJobFactory.createSqsJob(this.job, this);
     }
 
+    //TODO log all activities after trigger started
     @Override
     public void start(@Nonnull final Job<?, ?> job, final boolean newInstance) {
         super.start(job, newInstance);
@@ -142,6 +153,8 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
     @Override
     public void stop() {
         super.stop();
+
+        //TODO remove activity handler
 
         final DescriptorImpl descriptor = (DescriptorImpl) this.getDescriptor();
         descriptor.queue.execute(new Runnable() {
@@ -350,13 +363,12 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
             JSONArray sqsQueuesArray = new JSONArray();
             if (sqsQueues instanceof JSONObject) {
                 sqsQueuesArray.add(sqsQueues);
-            }
-            else if (sqsQueues instanceof JSONArray) {
+            } else if (sqsQueues instanceof JSONArray) {
                 sqsQueuesArray = (JSONArray) sqsQueues;
             }
 
             for (Object queue : sqsQueuesArray) {
-                JSONObject queueJson = (JSONObject)queue;
+                JSONObject queueJson = (JSONObject) queue;
                 JSONArray urls = queueJson.getJSONArray("url");
 
                 String url = urls.getString(queueJson.getInt("urlInputIndex"));
@@ -413,7 +425,7 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
 
             for (SQSTriggerQueue sqsQueue : this.sqsQueues) {
                 String version = sqsQueue.getVersion();
-                boolean compatible =  com.ribose.jenkins.plugin.awscodecommittrigger.utils.StringUtils.checkCompatibility(version,  compatibleSinceVersion);
+                boolean compatible = com.ribose.jenkins.plugin.awscodecommittrigger.utils.StringUtils.checkCompatibility(version, compatibleSinceVersion);
                 sqsQueue.setCompatible(compatible);
             }
 
@@ -444,8 +456,7 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
         public FormValidation doMigration() {
             try {
                 Jenkins.getActiveInstance().checkPermission(CredentialsProvider.CREATE);
-            }
-            catch (AccessDeniedException2 e){
+            } catch (AccessDeniedException2 e) {
                 return FormValidation.error("No Permission to Create new Credentials in the System");
             }
 

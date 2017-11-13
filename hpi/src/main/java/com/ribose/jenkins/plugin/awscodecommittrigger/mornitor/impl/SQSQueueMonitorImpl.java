@@ -30,7 +30,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-//TODO fix this class not thread-safe
 public class SQSQueueMonitorImpl implements SQSQueueMonitor {
 
     private final static Log log = Log.get(SQSQueueMonitorImpl.class);
