@@ -16,24 +16,24 @@ jobs:
     - stage: integration-test
       jdk: oraclejdk8
       env: spec=migration.*
-      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.migration.*' -Ptravis
+      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.migration.*'
 
     - stage: integration-test
       jdk: oraclejdk8
       env: spec=pipeline.*
-      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.pipeline.*' -Ptravis
+      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.pipeline.*'
 
     - stage: integration-test
       jdk: oraclejdk8
       env: spec=scmconfig.*
-      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.scmconfig.*' -Ptravis
+      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.scmconfig.*'
 
     - stage: integration-test
       jdk: oraclejdk8
       env: spec=subscribed_branch.*
-      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.subscribed_branch.*' -Ptravis
+      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.subscribed_branch.*'
 
     - stage: integration-test
       jdk: oraclejdk8
       env: spec=threads.*
-      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.threads.*' -Ptravis
+      script: mvn clean verify -Dtest='com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.threads.*'

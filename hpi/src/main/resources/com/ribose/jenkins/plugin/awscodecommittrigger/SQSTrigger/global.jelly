@@ -29,17 +29,15 @@
       var regionInput = findNearBy($this, '_.region');
       var selectInput = textInput.previousSiblings()[0];
 
-      regionInput = findAncestor(regionInput, 'TR');
+      // regionInput = findAncestor(regionInput, 'TR');
 
       return [
-        {inputs: [regionInput, selectInput], tagName: 'select'},
+        {inputs: [selectInput], tagName: 'select'},
         {inputs: [textInput], tagName: 'textbox'}
       ]
     }
     ]]>
   </script>
-
-  <!--<st:adjunct includes="com.ribose.jenkins.plugin.awscodecommittrigger.SQSTrigger"/>-->
 
   <f:section title="${%AWS Code Commit Trigger SQS Plugin}" name="AwsCodeCommitTriggerPlugin">
     <f:block>

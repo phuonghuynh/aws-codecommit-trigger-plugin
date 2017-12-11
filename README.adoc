@@ -2,9 +2,24 @@
 
 
 image:https://img.shields.io/:license-apache-blue.svg?style=flat-square[link=https://www.apache.org/licenses/LICENSE-2.0.html]
+http://sebastian-badge.info/plugins/aws-codecommit-trigger.svg
+
+[![CDNJS](http://img.shields.io/sebastian-badge.info/plugins/aws-codecommit-trigger.svg)]()
+
+https://travis-ci.org/jenkinsci/aws-codecommit-trigger-plugin.svg?branch=master
+
+https://img.shields.io/badge/sebastian-badge.info/plugins/aws-codecommit-trigger.svg
+
+/badge/dynamic/<TYPE>.svg?uri=http://sebastian-badge.info/plugins/aws-codecommit-trigger.svg&label=<LABEL>&query=<$.DATA.SUBDATA>&colorB=<COLOR>&prefix=<PREFIX>&suffix=<SUFFIX>
+
+
+
+
+
 image:https://img.shields.io/travis/jenkinsci/aws-codecommit-trigger-plugin.svg?style=flat-square[link=https://travis-ci.org/jenkinsci/aws-codecommit-trigger-plugin]
 image:http://hits.dwyl.io/jenkinsci/aws-codecommit-trigger-plugin.svg[link=http://hits.dwyl.io/jenkinsci/aws-codecommit-trigger-plugin]
 
+https://img.shields.io/sebastian-badge.info/plugins/aws-codecommit-trigger.svg?style=flat
 
 == Introduction
 

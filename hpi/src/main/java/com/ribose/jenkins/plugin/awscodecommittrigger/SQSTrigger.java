@@ -132,7 +132,6 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
         this.sqsJob = this.sqsJobFactory.createSqsJob(this.job, this);
     }
 
-    //TODO log all activities after trigger started
     @Override
     public void start(@Nonnull final Job<?, ?> job, final boolean newInstance) {
         super.start(job, newInstance);
@@ -153,8 +152,6 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
     @Override
     public void stop() {
         super.stop();
-
-        //TODO remove activity handler
 
         final DescriptorImpl descriptor = (DescriptorImpl) this.getDescriptor();
         descriptor.queue.execute(new Runnable() {

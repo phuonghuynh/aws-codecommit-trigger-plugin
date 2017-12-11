@@ -32,11 +32,11 @@ import java.util.logging.*;
 
 public class Log {
 
-//    private transient StreamHandler streamHandler;
-    private transient Logger logger;
-    private transient Class clazz;
-    private transient boolean fullLog = false;
-    private static transient Set<Log> logs = new HashSet<>();
+    private static final Set<Log> logs = Collections.synchronizedSet(new HashSet<Log>());
+
+    private Logger logger;
+    private Class clazz;
+    private boolean fullLog = false;
 
     private Log(Class clazz) {
         this.clazz = clazz;
@@ -69,42 +69,6 @@ public class Log {
             log.logger.addHandler(handler);
         }
     }
-
-//    public void error(final String message, final Object... args) {
-//        write(Level.SEVERE, message, args);
-//    }
-//
-//    public void error(String message, final SQSJob job, final Object... args) {
-//        error(message, (Job) job.getJenkinsJob(), args);
-//    }
-//
-//    public void error(String message, final Job job, final Object... args) {
-//        write(Level.SEVERE, message, job, args);
-//    }
-//
-//    public void info(final String message, final Object... args) {
-//        write(Level.INFO, message, args);
-//    }
-//
-//    public void info(String message, final Job job, final Object... args) {
-//        write(Level.INFO, message, job, args);
-//    }
-//
-//    public void info(String message, final SQSJob job, final Object... args) {
-//        this.info(message, (Job) job.getJenkinsJob(), args);
-//    }
-//
-//    public void debug(final String message, final Object... args) {
-//        write(Level.CONFIG, message, args);
-//    }
-//
-//    public void debug(String message, final Job job, final Object... args) {
-//        write(Level.CONFIG, message, job, args);
-//    }
-//
-//    public void debug(String message, final SQSJob job, final Object... args) {
-//        debug(message, (Job) job.getJenkinsJob(), args);
-//    }
 
     public void warning(final String message, final Object... args) {
         write(Level.WARNING, message, args);
@@ -157,16 +121,6 @@ public class Log {
             }
         }
 
-//        if (this.autoFormat) {
-//            final String id = String.format("%06X", Thread.currentThread().getId());
-//            source.append("[").append(ClassUtils.getAbbreviatedName(this.clazz, 1)).append("]")
-//                .append("[thread-").append(id).append("]");
-//            if (StringUtils.isNotBlank(jobName)) {
-//                source.append("[job-").append(jobName).append("]");
-//            }
-//        }
-
-//        String msg = String.format(message, args);
         args = params.toArray();
         String msg = String.format(message, args);
         if (level == Level.CONFIG) {
@@ -187,61 +141,6 @@ public class Log {
                 handler.flush();
             }
         }
-
-//        if (this.streamHandler != null) {
-//            this.streamHandler.flush();
-//        }
-    }
-
-//    private void write(final Level level, final String message, final String jobName, final Object... args) {
-//        StringBuilder messageBuilder = new StringBuilder(message);
-//        for (int i = 0; i < args.length; i++) {
-//            if (args[i] instanceof SQSTriggerQueue) {
-//                args[i] = ((SQSTriggerQueue) args[i]).getUrl();
-//            }
-//            else if (args[i] instanceof Throwable) {
-//                Throwable t = (Throwable) args[i];
-//                args[i] = ExceptionUtils.getStackTrace(t);
-////                messageBuilder.append("\nError Details: %s");
-//            }
-//        }
-////        message = messageBuilder.toString();
-//
-//        StringBuilder source = new StringBuilder();
-//        if (this.autoFormat) {
-//            final String id = String.format("%06X", Thread.currentThread().getId());
-//            source.append("[").append(ClassUtils.getAbbreviatedName(this.clazz, 1)).append("]")
-//                .append("[thread-").append(id).append("]");
-//            if (StringUtils.isNotBlank(jobName)) {
-//                source.append("[job-").append(jobName).append("]");
-//            }
-//        }
-//
-////        String msg = String.format(messageBuilder.toString(), args);
-//        String msg = messageBuilder.toString();
-//        if (level == Level.CONFIG) {
-//            msg = "[DEBUG] " + msg;
-//        } else if (level == Level.SEVERE) {
-//            msg = "[ERROR] " + msg;
-//        }
-//
-//        this.logger.logp(level, source.toString(), "", msg, args);
-//        if (this.streamHandler != null) {
-//            this.streamHandler.flush();
-//        }
-//    }
-
-//    private void write(final Level level, final String message, final Job job, final Object... args) {
-//        String name = job == null ? "--no-name--" : job.getName();
-//        this.write(level, message, name, args);
-//    }
-
-//    private void write(final Level level, final String message, final Object... args) {
-//        this.write(level, message, "", args);
-//    }
-
-    public Logger getLogger() {
-        return logger;
     }
 
     @Override

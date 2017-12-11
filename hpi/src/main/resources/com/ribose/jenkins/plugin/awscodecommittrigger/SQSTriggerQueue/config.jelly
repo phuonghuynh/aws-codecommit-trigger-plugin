@@ -10,7 +10,7 @@
   <j:set var="urlInputIndex" value="${instance.urlInputIndex != null ? instance.urlInputIndex : 0}"/>
 
   <f:entry title="AWS Region" field="region">
-    <f:select/>
+    <f:select />
     <tr/>
   </f:entry>
 
