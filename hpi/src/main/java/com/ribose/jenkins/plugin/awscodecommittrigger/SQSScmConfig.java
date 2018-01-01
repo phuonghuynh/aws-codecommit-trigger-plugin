@@ -96,9 +96,10 @@ public class SQSScmConfig extends AbstractDescribableImpl<SQSScmConfig> {
             if (StringUtils.isBlank(url)) {
                 return FormValidation.warning(Messages.warningBlankUrl());
             }
-            return com.ribose.jenkins.plugin.awscodecommittrigger.utils.StringUtils.isCodeCommitRepo(url)
-                ? FormValidation.ok()
-                : FormValidation.error(Messages.errorCodeCommitUrlInvalid());
+
+            return com.ribose.jenkins.plugin.awscodecommittrigger.utils.StringUtils.isCodeCommitRepo(url) ?
+                FormValidation.ok() :
+                FormValidation.error(Messages.errorCodeCommitUrlInvalid());
         }
     }
 }

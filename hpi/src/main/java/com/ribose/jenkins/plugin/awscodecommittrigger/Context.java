@@ -18,16 +18,27 @@ package com.ribose.jenkins.plugin.awscodecommittrigger;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.ribose.jenkins.plugin.awscodecommittrigger.factories.*;
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.*;
-import com.ribose.jenkins.plugin.awscodecommittrigger.matchers.EventTriggerMatcherImpl;
+import com.ribose.jenkins.plugin.awscodecommittrigger.factories.MessageParserFactoryImpl;
+import com.ribose.jenkins.plugin.awscodecommittrigger.factories.ScmFactoryImpl;
+import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.MessageParserFactory;
+import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueueProvider;
+import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.ScmFactory;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.RequestFactory;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.SQSFactory;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.impl.RequestFactoryImpl;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.impl.SQSFactoryImpl;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.threads.SQSExecutorFactory;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.threads.impl.SQSExecutorFactoryImpl;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.threads.impl.ThreadFactoryImpl;
+import com.ribose.jenkins.plugin.awscodecommittrigger.matchers.EventTriggerMatcher;
+import com.ribose.jenkins.plugin.awscodecommittrigger.matchers.impl.EventTriggerMatcherImpl;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.SQSQueueProviderImpl;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.job.SQSJobFactory;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.job.impl.SQSJobFactoryImpl;
-import com.ribose.jenkins.plugin.awscodecommittrigger.net.RequestFactory;
-import com.ribose.jenkins.plugin.awscodecommittrigger.net.RequestFactoryImpl;
-import com.ribose.jenkins.plugin.awscodecommittrigger.threading.ExecutorProviderImpl;
-import com.ribose.jenkins.plugin.awscodecommittrigger.threading.SQSQueueMonitorSchedulerImpl;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.ExecutorProvider;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.SQSQueueMonitorScheduler;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.impl.ExecutorProviderImpl;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.impl.SQSQueueMonitorSchedulerImpl;
 import jenkins.model.Jenkins;
 
 import java.util.concurrent.ExecutorService;
@@ -39,7 +50,7 @@ public class Context extends com.google.inject.AbstractModule {
     private static Injector injector;
 
     public synchronized static Injector injector() {
-        Jenkins jenkins = Jenkins.getInstance();//TODO optimize this code
+        Jenkins jenkins = Jenkins.getInstance();
         if (jenkins != null) {
             InternalInjector internalInjector = jenkins.lookup.setIfNull(InternalInjector.class, new InternalInjector());
             injector = internalInjector.resolve();

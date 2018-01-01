@@ -1,10 +1,9 @@
 <?jelly escape-by-default='true'?>
 
-<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:st="jelly:stapler">
     <f:entry title="${%SQS queue to monitor}" field="queueUuid">
         <f:select/>
     </f:entry>
-
 
     <f:entry title="Config SCM subscription">
         <table>
@@ -16,7 +15,7 @@
 
                     <j:if test="${not repoInfo.noUrlFound and instance.workflowJob}">
                         <f:block>
-                        <p class="warning" style="margin-top: 0px;">Trigger will read the SCM Steps defined in the
+                        <p class="warning" style="margin-top: 0;">Trigger will read the SCM Steps defined in the<st:nbsp/>
                             <a href="/jenkins/job/${instance.jobName}/lastBuild/flowGraphTable/">last build</a>
                         </p>
                         </f:block>
@@ -29,7 +28,7 @@
                         <j:otherwise>
                             <j:if test="${repoInfo.hasCodeCommit or repoInfo.hasNonCodeCommit}">
                                 <f:block>
-                                    <h4 style="font-style: italic; margin-top: 0px;">Subscribed to Auto-Detected CodeCommit Repos</h4>
+                                    <h4 style="font-style: italic; margin-top: 0;">Subscribed to Auto-Detected CodeCommit Repos</h4>
                                 </f:block>
                             </j:if>
 

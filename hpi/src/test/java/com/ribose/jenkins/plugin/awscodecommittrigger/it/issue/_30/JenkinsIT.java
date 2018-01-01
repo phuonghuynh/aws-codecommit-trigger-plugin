@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 
+
 @Issue("riboseinc/aws-codecommit-trigger-plugin/issues/30")
 public class JenkinsIT extends AbstractFreestyleIT {
 

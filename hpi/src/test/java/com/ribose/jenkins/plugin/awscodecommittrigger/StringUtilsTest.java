@@ -16,24 +16,15 @@
 
 package com.ribose.jenkins.plugin.awscodecommittrigger;
 
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.Event;
-import com.ribose.jenkins.plugin.awscodecommittrigger.model.entities.codecommit.Record;
+import com.amazonaws.regions.Regions;
 import com.ribose.jenkins.plugin.awscodecommittrigger.utils.StringUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.collections.Transformer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.assertj.core.api.Assertions;
-import org.eclipse.jgit.transport.URIish;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -114,18 +105,13 @@ public class StringUtilsTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void testSelects() {
-        Record r = new Record();
-        r.setUserIdentityARN("arn:sample");
-        List<Record> records = Arrays.asList(r, new Record());
-        Collection<Record> sample = CollectionUtils.select(records, new Predicate() {
-            @Override
-            public boolean evaluate(Object o) {
-                return o instanceof Record && ((Record) o).getUserIdentityARN() != null &&  ((Record) o).getUserIdentityARN().contains("sample");
-            }
-        });
+    public void testParseSqsUrl() {//https://git-codecommit.us-west-2.amazonaws.com/v1/repos/testjenkins
+        String url = "https://sqs.us-west-2.amazonaws.com/239062223385/testjenkinssqs";
+        Assertions.assertThat(StringUtils.getSqsRegion(url)).isEqualByComparingTo(Regions.US_WEST_2);
+        Assertions.assertThat(StringUtils.getSqsEndpoint(url)).isEqualToIgnoringCase("sqs.us-west-2.amazonaws.com");
+        Assertions.assertThat(StringUtils.getSqsQueueName(url)).isEqualToIgnoringCase("testjenkinssqs");
 
-        Assertions.assertThat(sample).hasSize(1);
+        url = "https://google.com";
+        Assertions.assertThat(StringUtils.getSqsRegion(url)).isNull();
     }
 }

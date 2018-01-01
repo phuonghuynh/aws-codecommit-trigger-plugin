@@ -17,6 +17,7 @@
 
 package com.ribose.jenkins.plugin.awscodecommittrigger;
 
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.model.Message;
 import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
@@ -29,11 +30,13 @@ import com.ribose.jenkins.plugin.awscodecommittrigger.exception.UnexpectedExcept
 import com.ribose.jenkins.plugin.awscodecommittrigger.i18n.sqstrigger.Messages;
 import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.*;
 import com.ribose.jenkins.plugin.awscodecommittrigger.logging.Log;
+import com.ribose.jenkins.plugin.awscodecommittrigger.matchers.EventTriggerMatcher;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.events.ConfigurationChangedEvent;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.events.EventBroker;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.job.RepoInfo;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.job.SQSJob;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.job.SQSJobFactory;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.SQSQueueMonitorScheduler;
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
@@ -42,11 +45,9 @@ import hudson.model.Job;
 import hudson.security.AccessDeniedException2;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
-import hudson.util.FormValidation;
-import hudson.util.ListBoxModel;
-import hudson.util.Secret;
-import hudson.util.SequentialExecutionQueue;
+import hudson.util.*;
 import jenkins.model.Jenkins;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
@@ -61,9 +62,16 @@ import org.kohsuke.stapler.StaplerRequest;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
+
+import static com.ribose.jenkins.plugin.awscodecommittrigger.PluginInfo.compatibleSinceVersion;
 
 
 public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
@@ -101,12 +109,22 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
 
     public Collection<? extends Action> getProjectActions() {
         if (this.job != null && CollectionUtils.isEmpty(this.actions)) {
-            this.actions = Collections.singletonList(new SQSActivityAction(this.job));
+            SQSActivityAction action = new SQSActivityAction(this.job);
+            try {
+                StreamTaskListener task = new StreamTaskListener(action.getActivityLogFile(), true, Charset.forName("UTF-8"));
+                StreamHandler handler = new StreamHandler(task.getLogger(), new SimpleFormatter());
+                Log.addHandler(handler);
+            } catch (IOException e) {
+                log.debug("Unable to log activities", e);
+            }
+
+            this.actions = Collections.singletonList(action);
         }
 
         if (this.actions == null) {
             this.actions = Collections.emptyList();
         }
+
         return this.actions;
     }
 
@@ -207,7 +225,7 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
                     new SQSTriggerBuilder(SQSTrigger.this.sqsJob, message, userarns).run();
                 } catch (Exception e) {
                     UnexpectedException error = new UnexpectedException(e);
-                    SQSTrigger.log.error("Unable to execute job for this message %s, cause: %s", SQSTrigger.this.job, message.getMessageId(), error);
+                    SQSTrigger.log.error("Unable to execute job for this message %s", SQSTrigger.this.job, error, message.getMessageId());
                     throw error;
                 }
             }
@@ -345,6 +363,37 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
                 String key = json.keys().next().toString();
                 sqsQueues = json.getJSONObject(key).get("sqsQueues");
             }
+
+            //TODO refactor this, url might be in array list
+            JSONArray sqsQueuesArray = new JSONArray();
+            if (sqsQueues instanceof JSONObject) {
+                sqsQueuesArray.add(sqsQueues);
+            } else if (sqsQueues instanceof JSONArray) {
+                sqsQueuesArray = (JSONArray) sqsQueues;
+            }
+
+            for (Object queue : sqsQueuesArray) {
+                JSONObject queueJson = (JSONObject) queue;
+                JSONArray urls = queueJson.getJSONArray("url");
+
+                String url = urls.getString(queueJson.getInt("urlInputIndex"));
+                queueJson.put("url", url);
+//                queueJson.remove("urlInputIndex");
+
+                Regions region = com.ribose.jenkins.plugin.awscodecommittrigger.utils.StringUtils.getSqsRegion(url);
+                if (region == null) {
+                    IllegalArgumentException error = new IllegalArgumentException(String.format("Unable to get Region from Queue Url %s", url));
+                    log.error("Saving aborted!", error);
+                    return false;
+                }
+                queueJson.put("region", region.name());
+            }
+
+            sqsQueues = sqsQueuesArray;
+            if (sqsQueuesArray.size() == 1) {
+                sqsQueues = sqsQueuesArray.get(0);
+            }
+
             this.sqsQueues = req.bindJSONToList(SQSTriggerQueue.class, sqsQueues);
             this.initQueueMap();
 
@@ -381,7 +430,7 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
 
             for (SQSTriggerQueue sqsQueue : this.sqsQueues) {
                 String version = sqsQueue.getVersion();
-                boolean compatible =  com.ribose.jenkins.plugin.awscodecommittrigger.utils.StringUtils.checkCompatibility(version,  com.ribose.jenkins.plugin.awscodecommittrigger.PluginInfo.compatibleSinceVersion);
+                boolean compatible = com.ribose.jenkins.plugin.awscodecommittrigger.utils.StringUtils.checkCompatibility(version, compatibleSinceVersion);
                 sqsQueue.setCompatible(compatible);
             }
 
@@ -412,8 +461,7 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
         public FormValidation doMigration() {
             try {
                 Jenkins.getActiveInstance().checkPermission(CredentialsProvider.CREATE);
-            }
-            catch (AccessDeniedException2 e){
+            } catch (AccessDeniedException2 e) {
                 return FormValidation.error("No Permission to Create new Credentials in the System");
             }
 
@@ -422,31 +470,33 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements SQSQueueListener {
             int originalSize = globalCredentials.size();
 
             for (SQSTriggerQueue sqsQueue : this.sqsQueues) {
-                if (!sqsQueue.isCompatible()) {
-                    final String accessKey = sqsQueue.getAccessKey();
-                    final Secret secretKey = sqsQueue.getSecretKey();
-
-                    StandardAwsCredentials credential = (StandardAwsCredentials) CollectionUtils.find(globalCredentials, new Predicate() {
-
-                        @Override
-                        public boolean evaluate(Object o) {
-                            if (!StandardAwsCredentials.class.isInstance(o)) {
-                                return false;
-                            }
-
-                            StandardAwsCredentials c = StandardAwsCredentials.class.cast(o);
-                            return c.getAccessKey().equals(accessKey) && c.getSecretKey().equals(secretKey);
-                        }
-                    });
-
-                    if (credential == null) {
-                        credential = new StandardAwsCredentials("imported", accessKey, secretKey);
-                        globalCredentials.add(credential);
-                    }
-
-                    sqsQueue.setCredentialsId(credential.getId());
-                    sqsQueue.setVersion(com.ribose.jenkins.plugin.awscodecommittrigger.PluginInfo.version);
+                if (sqsQueue.isCompatible()) {
+                    continue;
                 }
+
+                final String accessKey = sqsQueue.getAccessKey();
+                final Secret secretKey = sqsQueue.getSecretKey();
+
+                StandardAwsCredentials credential = (StandardAwsCredentials) CollectionUtils.find(globalCredentials, new Predicate() {
+
+                    @Override
+                    public boolean evaluate(Object o) {
+                        if (!StandardAwsCredentials.class.isInstance(o)) {
+                            return false;
+                        }
+
+                        StandardAwsCredentials c = StandardAwsCredentials.class.cast(o);
+                        return c.getAccessKey().equals(accessKey) && c.getSecretKey().equals(secretKey);
+                    }
+                });
+
+                if (credential == null) {
+                    credential = new StandardAwsCredentials("imported", accessKey, secretKey);
+                    globalCredentials.add(credential);
+                }
+
+                sqsQueue.setCredentialsId(credential.getId());
+                sqsQueue.setVersion(com.ribose.jenkins.plugin.awscodecommittrigger.PluginInfo.version);
             }
 
             if (originalSize < globalCredentials.size()) {//save new credentials added

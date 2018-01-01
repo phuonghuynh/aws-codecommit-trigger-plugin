@@ -3,8 +3,8 @@ package com.ribose.jenkins.plugin.awscodecommittrigger.it.mock;
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
 import com.ribose.jenkins.plugin.awscodecommittrigger.InternalInjector;
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSFactory;
 import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.ScmFactory;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.SQSFactory;
 import jenkins.model.Jenkins;
 
 public class MockContext extends com.google.inject.AbstractModule {
@@ -21,7 +21,8 @@ public class MockContext extends com.google.inject.AbstractModule {
     }
 
     public static InternalInjector getInjector() {
-        InternalInjector inject = Jenkins.getInstance().lookup.get(InternalInjector.class);
+        Jenkins jenkins = Jenkins.getInstance();
+        InternalInjector inject = jenkins == null ? new InternalInjector(): jenkins.lookup.get(InternalInjector.class);
         Module module = Modules.override(inject.getModule()).with(new MockContext());
         inject.setModule(module);
         return inject;

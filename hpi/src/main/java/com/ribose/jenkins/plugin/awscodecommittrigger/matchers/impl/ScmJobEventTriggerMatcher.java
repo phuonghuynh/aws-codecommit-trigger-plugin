@@ -19,8 +19,8 @@ package com.ribose.jenkins.plugin.awscodecommittrigger.matchers.impl;
 import com.ribose.jenkins.plugin.awscodecommittrigger.SQSScmConfig;
 import com.ribose.jenkins.plugin.awscodecommittrigger.SQSTrigger;
 import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.Event;
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.EventTriggerMatcher;
 import com.ribose.jenkins.plugin.awscodecommittrigger.logging.Log;
+import com.ribose.jenkins.plugin.awscodecommittrigger.matchers.EventTriggerMatcher;
 import com.ribose.jenkins.plugin.awscodecommittrigger.model.job.SQSJob;
 import hudson.plugins.git.BranchSpec;
 import hudson.plugins.git.GitSCM;
@@ -41,7 +41,7 @@ public class ScmJobEventTriggerMatcher implements EventTriggerMatcher {
     private static final Log log = Log.get(ScmJobEventTriggerMatcher.class);
 
     @Override
-    public boolean matches(List<Event> events, SQSJob job) {//TODO load scm list
+    public boolean matches(List<Event> events, SQSJob job) {
         SQSTrigger trigger = job.getTrigger();
         List<SQSScmConfig> scmConfigs = new ArrayList<>();
 
@@ -75,7 +75,6 @@ public class ScmJobEventTriggerMatcher implements EventTriggerMatcher {
             }
 
             for (Event event : events) {
-                log.debug("Matching event %s with SCM %s", event, scm.getKey());
                 if (this.matches(event, scm)) {
                     log.debug("Hurray! Event %s matched SCM %s", job, event.getArn(), scm.getKey());
                     return true;
@@ -92,13 +91,9 @@ public class ScmJobEventTriggerMatcher implements EventTriggerMatcher {
             return false;
         }
 
-        if (this.isGitScmAvailable() && this.matchesGitSCM(event, scm)) {
-            return true;
-        } else if (this.isMultiScmAvailable() && this.matchesMultiSCM(event, scm)) {
-            return true;
-        } else {
-            return false;
-        }
+        boolean matched = this.isGitScmAvailable() && this.matchesGitSCM(event, scm); //git matched
+        matched = matched ||  this.isMultiScmAvailable() && this.matchesMultiSCM(event, scm); //multi scm matched
+        return matched;
     }
 
     private boolean matchesGitSCM(final Event event, final SCM scmProvider) {
@@ -139,15 +134,15 @@ public class ScmJobEventTriggerMatcher implements EventTriggerMatcher {
         return false;
     }
 
-    private boolean matchBranch(final Event event, final List<BranchSpec> branchSpecs) {//TODO use it
+    private boolean matchBranch(final Event event, final List<BranchSpec> branchSpecs) {
         for (BranchSpec branchSpec : branchSpecs) {
             if (branchSpec.matches(event.getBranch())) {
-                log.debug("Event %s matched branch %s", event.getArn(), branchSpec.getName());
+                log.debug("Event arn=%s matched branch name=%s", event.getArn(), branchSpec.getName());
                 return true;
             }
         }
 
-        log.debug("Found no event matched any branch", event.getArn());
+        log.debug("Found no event matched any branch arn=%s", event.getArn());
         return false;
     }
 
@@ -158,13 +153,13 @@ public class ScmJobEventTriggerMatcher implements EventTriggerMatcher {
     private URIish getMatchesConfig(final Event event, final RemoteConfig config) {
         List<URIish> uris = config.getURIs();
         for (final URIish uri : uris) {
-            if (event.isMatch(uri)) {//TODO use here matchBranch(event, branchSpec)
-                log.debug("Event %s matched uri %s", event.getArn(), uri);
+            if (event.isMatch(uri)) {
+                log.debug("Event arn=%s matched uri=%s", event.getArn(), uri);
                 return uri;
             }
         }
 
-        log.debug("Found no event matched config: ", event.getArn(), config.getName());
+        log.debug("Found no event arn=%s matched config name=%s ", event.getArn(), config.getName());
         return null;
     }
 

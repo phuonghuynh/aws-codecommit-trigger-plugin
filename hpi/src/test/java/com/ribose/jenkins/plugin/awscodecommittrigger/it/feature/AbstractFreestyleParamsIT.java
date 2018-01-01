@@ -9,6 +9,7 @@ import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public abstract class AbstractFreestyleParamsIT extends AbstractFreestyleIT {
+
     @Parameterized.Parameter
     public String name;
 

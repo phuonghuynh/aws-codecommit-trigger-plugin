@@ -17,18 +17,23 @@
 package com.ribose.jenkins.plugin.awscodecommittrigger.it.mock;
 
 import com.amazonaws.ClientConfiguration;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.ribose.jenkins.plugin.awscodecommittrigger.Context;
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSFactory;
+import com.ribose.jenkins.plugin.awscodecommittrigger.credentials.AwsCredentials;
 import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueue;
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueueMonitor;
-import com.ribose.jenkins.plugin.awscodecommittrigger.net.RequestFactory;
-import com.ribose.jenkins.plugin.awscodecommittrigger.net.SQSChannel;
-import com.ribose.jenkins.plugin.awscodecommittrigger.net.SQSChannelImpl;
-import com.ribose.jenkins.plugin.awscodecommittrigger.threading.SQSQueueMonitorImpl;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.RequestFactory;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.SQSChannel;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.SQSFactory;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.impl.SQSChannelImpl;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.SQSQueueMonitor;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.impl.SQSQueueMonitorImpl;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.net.Proxy;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 
@@ -52,7 +57,7 @@ public class MockSQSFactory implements SQSFactory {
     }
 
     @Override
-    public AmazonSQS createSQSAsync(String accessKey, String secretKey, String region) {
+    public AmazonSQS createSQSAsync(String accessKey, String secretKey, Regions region) {
         return MockAwsSqs.get().getSqsClient();
     }
 
@@ -71,6 +76,17 @@ public class MockSQSFactory implements SQSFactory {
 
     @Override
     public ClientConfiguration getClientConfiguration(Proxy proxy) {
+        return null;
+    }
+
+    @Override
+    public boolean hasSufficientPermissions(@Nonnull String url, @Nonnull String credentialsId) {
+        return false;
+    }
+
+    @CheckForNull
+    @Override
+    public List<String> getListQueues(@Nonnull String credentialsId, @Nonnull Regions region) {
         return null;
     }
 

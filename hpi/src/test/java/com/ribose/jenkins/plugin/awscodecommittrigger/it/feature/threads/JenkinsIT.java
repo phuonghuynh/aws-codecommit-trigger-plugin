@@ -2,10 +2,7 @@ package com.ribose.jenkins.plugin.awscodecommittrigger.it.feature.threads;
 
 import com.ribose.jenkins.plugin.awscodecommittrigger.it.AbstractFreestyleIT;
 import com.ribose.jenkins.plugin.awscodecommittrigger.it.fixture.ProjectFixture;
-import hudson.util.OneShotEvent;
-import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,19 +13,18 @@ import java.util.concurrent.TimeUnit;
 
 public class JenkinsIT extends AbstractFreestyleIT {
 
-    @Parameterized.Parameter(1)
     public List<ProjectFixture> projectFixtures;
 
     public JenkinsIT() {
         projectFixtures = new ArrayList<>();
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 29; i++) {
             String branch = String.format("%s_%s", i, UUID.randomUUID().toString());
             projectFixtures.add(
                 new ProjectFixture()
                     .setScm(defaultSCM)
                     .setSendBranches("refs/heads/" + branch)
                     .setSubscribeInternalScm(true)
-                    .setShouldStarted(Boolean.TRUE)
+                    .setShouldStarted(true)
             );
         }
     }
@@ -58,11 +54,7 @@ public class JenkinsIT extends AbstractFreestyleIT {
         threadPool.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
 
         for (ProjectFixture fixture : this.projectFixtures) {
-            Assertions.assertThat(fixture.getEvent()).isNotNull();
-
-            OneShotEvent event = fixture.getEvent();
-            event.block(fixture.getTimeout());
-            Assertions.assertThat(event.isSignaled()).isEqualTo(fixture.getShouldStarted());
+            this.assertFixture(fixture);
         }
     }
 }

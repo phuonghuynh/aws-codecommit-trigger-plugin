@@ -60,7 +60,7 @@ public class CodeCommitMessageParser implements MessageParser {
 
             events = this.parseRecords(json);
         } catch (final com.google.gson.JsonSyntaxException e) {
-            log.error("JSON syntax exception, cannot parse message: %s", e);
+            log.error("JSON syntax exception, cannot parse message", e);
         }
 
         return events;

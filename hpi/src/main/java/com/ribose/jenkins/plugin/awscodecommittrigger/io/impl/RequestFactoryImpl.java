@@ -15,13 +15,15 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.net;
+package com.ribose.jenkins.plugin.awscodecommittrigger.io.impl;
 
 import com.amazonaws.services.sqs.model.DeleteMessageBatchRequest;
 import com.amazonaws.services.sqs.model.DeleteMessageBatchRequestEntry;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+import com.ribose.jenkins.plugin.awscodecommittrigger.SQSTriggerQueue;
 import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueue;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.RequestFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +42,11 @@ public class RequestFactoryImpl implements RequestFactory {
         request.setMaxNumberOfMessages(maxNumberMessages);
         request.setWaitTimeSeconds(waitTimeSeconds);
         return request;
+    }
+
+    @Override
+    public ReceiveMessageRequest createReceiveMessageRequest(String queueUrl) {
+        return createReceiveMessageRequest(queueUrl, SQSTriggerQueue.MAX_NUMBER_OF_MESSAGES_DEFAULT, SQSTriggerQueue.WAIT_TIME_SECONDS_DEFAULT);
     }
 
     @Override

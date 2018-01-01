@@ -5,8 +5,9 @@ import com.amazonaws.auth.AWSCredentialsProvider;
 import com.cloudbees.plugins.credentials.CredentialsNameProvider;
 import com.cloudbees.plugins.credentials.NameWith;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import org.apache.commons.lang3.StringUtils;
+
+import javax.annotation.Nonnull;
 
 
 @NameWith(value = AwsCredentials.NameProvider.class, priority = 1)
@@ -16,9 +17,9 @@ public interface AwsCredentials extends StandardCredentials, AWSCredentials, AWS
 
     class NameProvider extends CredentialsNameProvider<AwsCredentials> {
 
-        @NonNull
+        @Nonnull
         @Override
-        public String getName(@NonNull AwsCredentials credentials) {
+        public String getName(@Nonnull AwsCredentials credentials) {
             String displayName = credentials.getDisplayName();
             if (StringUtils.isNotBlank(displayName)) {
                 return displayName;

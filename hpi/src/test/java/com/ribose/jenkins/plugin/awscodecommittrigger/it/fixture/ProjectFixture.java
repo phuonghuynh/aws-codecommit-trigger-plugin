@@ -21,6 +21,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ribose.jenkins.plugin.awscodecommittrigger.SQSScmConfig;
 import hudson.model.FreeStyleBuild;
+import com.ribose.jenkins.plugin.awscodecommittrigger.SQSTrigger;
 import hudson.scm.SCM;
 import hudson.util.OneShotEvent;
 
@@ -28,7 +29,9 @@ import java.util.List;
 
 
 public class ProjectFixture implements MarkIndex {
-    private static final Long TIMEOUT = 90_000L;//in milliseconds, e.g: 300_000 ~ 5 mins
+    private static final Long TIMEOUT = 10_000L;//in milliseconds, e.g: 300_000 ~ 5 mins
+
+    private SQSTrigger sqsTrigger;
 
     private List<SQSScmConfig> scmConfigs;
     private boolean subscribeInternalScm;
@@ -41,7 +44,6 @@ public class ProjectFixture implements MarkIndex {
     private Long timeout = TIMEOUT;
     private OneShotEvent event;
     private String sqsMessage;
-    private boolean hasTrigger = true;
 
     private static final Gson gson = new GsonBuilder()
         .setFieldNamingStrategy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
@@ -64,7 +66,7 @@ public class ProjectFixture implements MarkIndex {
     }
 
     public ProjectFixture setShouldStarted(boolean shouldStarted) {
-        this.shouldStarted = shouldStarted;
+        this.shouldStarted = shouldStarted;//021047083
         return this;
     }
 
@@ -147,13 +149,12 @@ public class ProjectFixture implements MarkIndex {
         return this;
     }
 
-    public boolean isHasTrigger() {
-        return hasTrigger;
+    public SQSTrigger getSqsTrigger() {
+        return sqsTrigger;
     }
 
-    public ProjectFixture setHasTrigger(boolean hasTrigger) {
-        this.hasTrigger = hasTrigger;
-        return this;
+    public void setSqsTrigger(SQSTrigger sqsTrigger) {
+        this.sqsTrigger = sqsTrigger;
     }
 
     public FreeStyleBuild getLastBuild() {

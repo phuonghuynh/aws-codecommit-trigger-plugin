@@ -1,58 +1,49 @@
 <?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:c="/lib/credentials" xmlns:st="jelly:stapler">
 
-<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:c="/lib/credentials" xmlns:st="jelly:stapler" >
-    <f:invisibleEntry>
-        <f:readOnlyTextbox field="uuid"/>
-        <f:readOnlyTextbox field="version" value="${descriptor.version}"/>
-    </f:invisibleEntry>
+  <f:invisibleEntry>
+    <f:readOnlyTextbox field="uuid"/>
+    <f:readOnlyTextbox field="version" value="${descriptor.version}"/>
+    <f:readOnlyTextbox field="urlInputIndex" default="0" />
+  </f:invisibleEntry>
 
-    <f:description>Support only <b>"Standard Aws Credentials"</b></f:description>
+  <j:set var="urlInputIndex" value="${instance.urlInputIndex != null ? instance.urlInputIndex : 0}"/>
 
-    <f:entry field="credentialsId" title="Credentials">
-        <c:select context="com.ribose.jenkins.plugins.awscodecommittrigger.credentials.StandardAwsCredentials" />
+  <f:entry title="AWS Region" field="region">
+    <f:select />
+    <tr/>
+  </f:entry>
+
+  <f:entry title="${%SQS Queue}" field="url">
+    <f:select style="display: ${urlInputIndex == 0 ? '' : 'none'}"/>
+    <f:textbox style="display: ${urlInputIndex == 1 ? '' : 'none'}" />
+
+    <f:helpLink url="${descriptor.getHelpFile('url-selectbox')}" featureName="${title}" />
+    <f:helpArea />
+
+    <f:entry>
+      <span>
+        you can also<st:nbsp/>
+        <a href="" onclick="return setUrlInputVisible(this, 'textbox')"><strong>enter queue url</strong></a><st:nbsp/>
+        or<st:nbsp/>
+        <a href="" onclick="return setUrlInputVisible(this, 'select')"><strong>select queue</strong></a>
+      </span>
+    </f:entry>
+  </f:entry>
+
+  <f:entry field="credentialsId" title="Credentials" description='Support only "Standard Aws Credentials"'>
+    <c:select context="com.ribose.jenkins.plugins.awscodecommittrigger.credentials.StandardAwsCredentials"/>
+  </f:entry>
+
+  <f:validateButton title="${%Test access}" with="url,credentialsId,urlInputIndex" method="validate"/>
+
+  <f:advanced title="${%Advanced}">
+    <f:entry title="${%Request wait time [s]}" field="waitTimeSeconds">
+      <f:textbox default="20"/>
     </f:entry>
 
-    <f:entry title="AWS Region" field="region">
-        <f:select />
-        <tr/>
+    <f:entry title="${%Max. number of messages}" field="maxNumberOfMessages">
+      <f:textbox default="10"/>
     </f:entry>
-
-    <!--<f:entry title="${%SQS Queue}" field="url">-->
-
-        <!--<f:radioBlock title="Enter queue url" name="abc" checked="true" value="true">-->
-            <!--<f:block>-->
-                <!--<f:select />-->
-            <!--</f:block>-->
-        <!--</f:radioBlock>-->
-        <!--<p>-->
-            <!--<input type="button" value="Enter Queue url" class="yui-button validate-button" />-->
-
-            <!--<f:radioBlock title="Enter queue url" name="abc" checked="false" value="false">-->
-                <!--<f:block>-->
-                <!--<f:textbox />-->
-                <!--</f:block>-->
-            <!--</f:radioBlock>-->
-            <!--<a href="">Click to enter Queue url if the list is empy</a>-->
-        <!--</p>-->
-    <!--</f:entry>-->
-
-    <f:entry title="${%SQS Queue}" field="url">
-        <f:select />
-        <tr/>
-    </f:entry>
-
-        <f:validateButton title="${%Test access}" with="region,url,credentialsId" method="validate"/>
-
-
-
-    <f:advanced title="${%Advanced}">
-        <f:entry title="${%Request wait time [s]}" field="waitTimeSeconds">
-            <f:textbox default="20"/>
-        </f:entry>
-
-        <f:entry title="${%Max. number of messages}" field="maxNumberOfMessages">
-            <!--f:textbox default="10"/-->
-            <f:textbox default="10"/>
-        </f:entry>
-    </f:advanced>
+  </f:advanced>
 </j:jelly>

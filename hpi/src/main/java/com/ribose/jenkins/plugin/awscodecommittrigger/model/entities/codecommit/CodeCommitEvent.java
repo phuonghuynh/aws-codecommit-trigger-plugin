@@ -74,16 +74,16 @@ public class CodeCommitEvent implements Event {
         }
 
         if (!StringUtils.equals(this.host, uri.getHost())) {
-            log.debug("Event %s not match host %s", this.getArn(), uri.getHost());
+            log.debug("Event arn=%s not match host=%s", this.getArn(), uri.getHost());
             return false;
         }
 
         if (!StringUtils.equals(this.path, uri.getPath())) {
-            log.debug("Event %s not match path %s", this.getArn(), uri.getPath());
+            log.debug("Event arn=%s not match path=%s", this.getArn(), uri.getPath());
             return false;
         }
 
-        log.debug("Event %s match uri %s", this.getArn(), uri);
+        log.debug("Event arn=%s match uri=%s", this.getArn(), uri);
         return true;
     }
 

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.factories;
+package com.ribose.jenkins.plugin.awscodecommittrigger.io.threads.impl;
 
 import com.google.inject.Inject;
-import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSExecutorFactory;
+import com.ribose.jenkins.plugin.awscodecommittrigger.io.threads.SQSExecutorFactory;
 
 import java.util.concurrent.*;
 

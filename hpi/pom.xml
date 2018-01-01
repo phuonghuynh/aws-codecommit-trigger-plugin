@@ -51,6 +51,24 @@
     </developers>
 
     <dependencies>
+        <!--<dependency>-->
+            <!--<groupId>com.amazonaws</groupId>-->
+            <!--<artifactId>aws-java-sdk-sqs</artifactId>-->
+            <!--<optional>true</optional>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+            <!--<groupId>com.fasterxml.jackson.core</groupId>-->
+            <!--<artifactId>jackson-databind</artifactId>-->
+            <!--<optional>true</optional>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+            <!--<groupId>com.fasterxml.jackson.dataformat</groupId>-->
+            <!--<artifactId>jackson-dataformat-cbor</artifactId>-->
+            <!--<optional>true</optional>-->
+        <!--</dependency>-->
+
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>shaded</artifactId>
@@ -184,12 +202,6 @@
         <profile>
             <!-- for running integration test if needed, disabled by default -->
             <id>it</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
             <properties>
                 <java.level>8</java.level>
             </properties>

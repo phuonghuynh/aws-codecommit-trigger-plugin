@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-package com.ribose.jenkins.plugin.awscodecommittrigger.interfaces;
+package com.ribose.jenkins.plugin.awscodecommittrigger.io;
 
 import com.amazonaws.ClientConfiguration;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
+import com.ribose.jenkins.plugin.awscodecommittrigger.credentials.AwsCredentials;
+import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueue;
+import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.SQSQueueMonitor;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import java.net.Proxy;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 
@@ -41,7 +48,7 @@ public interface SQSFactory {
 
     AmazonSQS createSQSAsync(String accessKey, String secretKey);
 
-    AmazonSQS createSQSAsync(String accessKey, String secretKey, String region);
+    AmazonSQS createSQSAsync(String accessKey, String secretKey, Regions region);
 
     /**
      * Returns a new monitor instance that can be used to poll the specified queue for new
@@ -66,4 +73,12 @@ public interface SQSFactory {
     SQSQueueMonitor createMonitor(final SQSQueueMonitor monitor, final SQSQueue queue);
 
     ClientConfiguration getClientConfiguration(final Proxy proxy);
+
+    /**
+     * @return true if user has all sufficient permissions required in "resources/.../help-credentialsId.html"
+     */
+    boolean hasSufficientPermissions(@Nonnull String url, @Nonnull String credentialsId);
+
+    @CheckForNull
+    List<String> getListQueues(@Nonnull String credentialsId, @Nonnull Regions region);
 }

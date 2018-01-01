@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import jenkins.ProxyInjector;
 
+
 public class InternalInjector extends ProxyInjector {
 
     private Module module = new Context();

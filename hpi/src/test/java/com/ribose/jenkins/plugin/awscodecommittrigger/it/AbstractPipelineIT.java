@@ -11,6 +11,7 @@ import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
 import java.util.UUID;
 
+
 public class AbstractPipelineIT extends AbstractJenkinsIT {
 
     protected static OneShotEvent buildEvent;
@@ -27,10 +28,6 @@ public class AbstractPipelineIT extends AbstractJenkinsIT {
         jenkinsRule.assertBuildStatusSuccess(run.get());
 
         resetPipelineBuildEvent(fixture);
-
-        if (!fixture.isHasTrigger()) {
-            return;
-        }
 
         final String uuid = this.sqsQueue.getUuid();
         SQSTrigger trigger = new SQSTrigger(uuid, fixture.isSubscribeInternalScm(), fixture.getScmConfigs());

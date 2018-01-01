@@ -25,3 +25,6 @@ docker/
 ruby/
 
 AwsFunctionsIT.java
+Dockerfile.test
+.circleci/
+MultiProjectFixtureIT.java
