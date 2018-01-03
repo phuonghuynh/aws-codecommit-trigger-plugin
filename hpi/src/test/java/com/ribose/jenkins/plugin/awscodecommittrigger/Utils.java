@@ -1,10 +1,7 @@
 package com.ribose.jenkins.plugin.awscodecommittrigger;
 
-import com.ribose.jenkins.plugin.awscodecommittrigger.it.fixture.MarkIndex;
-
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
+
 
 public class Utils {
 

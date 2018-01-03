@@ -1,4 +1,3 @@
-
 package com.ribose.jenkins.plugin.awscodecommittrigger.model.events;
 
 import com.google.common.eventbus.EventBus;

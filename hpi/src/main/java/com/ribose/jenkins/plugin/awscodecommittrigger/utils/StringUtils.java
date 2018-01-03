@@ -16,7 +16,6 @@
 
 package com.ribose.jenkins.plugin.awscodecommittrigger.utils;
 
-
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.model.Message;
 import org.apache.commons.lang3.EnumUtils;
@@ -126,7 +125,7 @@ public final class StringUtils {
     /**
      * Read `MessageId` from given message.body
      *
-     * @param message
+     * @param message the sqs message to read message-id
      * @return Message Id
      * */
     @CheckForNull
@@ -145,10 +144,7 @@ public final class StringUtils {
         }
 
         String repoName = getCodeCommitRepoName(url);
-        if (org.apache.commons.lang3.StringUtils.isEmpty(repoName)) {
-            return false;
-        }
-        return true;
+        return !org.apache.commons.lang3.StringUtils.isEmpty(repoName);
     }
 
     // return true if "sourceVersion" compatible with "destVersion"
@@ -162,14 +158,14 @@ public final class StringUtils {
 
         Boolean compatible = null;
         while (compatible == null && dest.find()) {
-            int destv = Integer.parseInt(dest.group());
+            int dest_v = Integer.parseInt(dest.group());
             source.find();
-            int sourcev = Integer.parseInt(source.group());
+            int source_v = Integer.parseInt(source.group());
 
-            if (destv > sourcev) {
+            if (dest_v > source_v) {
                 compatible = Boolean.FALSE;
             }
-            else if (destv <= sourcev) {
+            else if (dest_v <= source_v) {
                 compatible = Boolean.TRUE;
             }
         }

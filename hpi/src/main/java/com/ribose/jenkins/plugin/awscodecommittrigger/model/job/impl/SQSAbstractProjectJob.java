@@ -11,6 +11,7 @@ import hudson.scm.SCM;
 import java.util.Arrays;
 import java.util.List;
 
+
 public class SQSAbstractProjectJob extends AbstractSQSJob {
 
     private final AbstractProject job;

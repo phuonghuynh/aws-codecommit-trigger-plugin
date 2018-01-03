@@ -20,7 +20,6 @@ import com.amazonaws.ClientConfiguration;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.ribose.jenkins.plugin.awscodecommittrigger.Context;
-import com.ribose.jenkins.plugin.awscodecommittrigger.credentials.AwsCredentials;
 import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.SQSQueue;
 import com.ribose.jenkins.plugin.awscodecommittrigger.io.RequestFactory;
 import com.ribose.jenkins.plugin.awscodecommittrigger.io.SQSChannel;

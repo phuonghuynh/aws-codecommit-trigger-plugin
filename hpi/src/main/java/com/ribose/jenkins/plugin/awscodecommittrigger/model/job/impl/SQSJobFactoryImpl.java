@@ -7,6 +7,7 @@ import hudson.model.AbstractProject;
 import hudson.model.Job;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 
+
 public class SQSJobFactoryImpl implements SQSJobFactory {
 
     @Override

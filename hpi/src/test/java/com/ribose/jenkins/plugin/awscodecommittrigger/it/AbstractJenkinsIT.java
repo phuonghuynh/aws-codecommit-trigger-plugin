@@ -6,7 +6,6 @@ import com.ribose.jenkins.plugin.awscodecommittrigger.it.mock.MockAwsSqs;
 import com.ribose.jenkins.plugin.awscodecommittrigger.it.mock.MockContext;
 import com.ribose.jenkins.plugin.awscodecommittrigger.it.mock.MockGitSCM;
 import com.ribose.jenkins.plugin.awscodecommittrigger.matchers.impl.ScmJobEventTriggerMatcher;
-import com.ribose.jenkins.plugin.awscodecommittrigger.mornitor.SQSQueueMonitor;
 import com.ribose.jenkins.plugin.awscodecommittrigger.rule.RegexLoggerRule;
 import hudson.plugins.git.GitSCM;
 import hudson.util.OneShotEvent;

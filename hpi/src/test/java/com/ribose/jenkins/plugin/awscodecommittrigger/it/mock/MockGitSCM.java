@@ -12,14 +12,11 @@ import hudson.plugins.git.SubmoduleConfig;
 import hudson.plugins.git.UserRemoteConfig;
 import hudson.plugins.git.browser.GitRepositoryBrowser;
 import hudson.plugins.git.extensions.GitSCMExtension;
-import hudson.plugins.git.extensions.GitSCMExtensionDescriptor;
-import hudson.scm.RepositoryBrowser;
 import hudson.scm.SCMDescriptor;
 import hudson.scm.SCMRevisionState;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,7 +39,7 @@ public class MockGitSCM extends GitSCM {
     }
 
     @Override
-    public void checkout(Run<?, ?> build, Launcher launcher, FilePath workspace, TaskListener listener, File changelogFile, SCMRevisionState baseline) throws IOException, InterruptedException {
+    public void checkout(Run<?, ?> build, Launcher launcher, FilePath workspace, TaskListener listener, File changelogFile, SCMRevisionState baseline) {
     }
 
     public String getUrl() {

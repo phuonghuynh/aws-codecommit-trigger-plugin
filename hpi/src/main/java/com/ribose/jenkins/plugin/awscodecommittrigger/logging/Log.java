@@ -54,7 +54,7 @@ public class Log {
         });
     }
 
-    public static Log get(Class clazz, PrintStream out, boolean fullLog) throws IOException {
+    public static Log get(Class clazz, PrintStream out, boolean fullLog) {
         Log log = get(clazz);
         log.fullLog = fullLog;
 

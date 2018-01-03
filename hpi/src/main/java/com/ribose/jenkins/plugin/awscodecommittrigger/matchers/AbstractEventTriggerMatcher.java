@@ -23,6 +23,7 @@ import org.apache.commons.collections.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public abstract class AbstractEventTriggerMatcher implements EventTriggerMatcher {
 
     protected List<EventTriggerMatcher> matchers;

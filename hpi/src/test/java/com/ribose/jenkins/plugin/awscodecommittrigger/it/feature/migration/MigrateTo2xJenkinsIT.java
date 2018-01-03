@@ -12,7 +12,6 @@ import com.ribose.jenkins.plugin.awscodecommittrigger.Utils;
 import com.ribose.jenkins.plugin.awscodecommittrigger.utils.StringUtils;
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;

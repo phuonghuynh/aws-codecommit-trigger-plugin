@@ -7,6 +7,7 @@ import com.ribose.jenkins.plugin.awscodecommittrigger.interfaces.ScmFactory;
 import com.ribose.jenkins.plugin.awscodecommittrigger.io.SQSFactory;
 import jenkins.model.Jenkins;
 
+
 public class MockContext extends com.google.inject.AbstractModule {
 
     @Override

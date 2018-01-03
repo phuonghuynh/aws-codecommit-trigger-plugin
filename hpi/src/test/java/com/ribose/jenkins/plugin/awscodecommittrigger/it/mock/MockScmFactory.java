@@ -6,6 +6,7 @@ import hudson.plugins.git.GitSCM;
 
 import java.util.List;
 
+
 public class MockScmFactory implements ScmFactory {
 
     public MockScmFactory() {

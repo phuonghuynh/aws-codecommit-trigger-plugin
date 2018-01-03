@@ -22,6 +22,7 @@ import com.amazonaws.services.sqs.model.*;
 
 import java.util.Collections;
 
+
 public class MockSQSClient extends AmazonSQSClient {
 
     private String queueUrl;

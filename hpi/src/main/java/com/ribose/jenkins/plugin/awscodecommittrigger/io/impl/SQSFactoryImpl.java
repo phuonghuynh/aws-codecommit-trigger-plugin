@@ -165,15 +165,6 @@ public class SQSFactoryImpl implements SQSFactory {
     @Override
     public boolean hasSufficientPermissions(@Nonnull String url, @Nonnull String credentialsId) {
 
-//        if (org.apache.commons.lang3.StringUtils.isBlank(credentialsId)) {
-//            return false;
-//        }
-
-//        String endpoint = com.ribose.jenkins.plugin.awscodecommittrigger.utils.StringUtils.getSqsEndpoint(url);
-//        if (StringUtils.isEmpty(endpoint)) {
-//            return false;
-//        }
-
         AwsCredentials credentials = AwsCredentialsHelper.getCredentials(credentialsId);
         if (credentials == null) {
             return false;
@@ -184,10 +175,6 @@ public class SQSFactoryImpl implements SQSFactory {
         if (region == null) {
             return false;
         }
-
-//        if (org.apache.commons.lang3.StringUtils.isEmpty(region)) {
-//            return FormValidation.error(String.format("Region not found from Queue: %s", url));
-//        }
 
         AmazonSQS client = createSQSAsync(credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey(), region);
 
@@ -200,12 +187,9 @@ public class SQSFactoryImpl implements SQSFactory {
         }
         catch (EmptyBatchRequestException e) {
             return true;
-//            return FormValidation.okWithMarkup("<span class=\"info\">Access to SQS successful</span>");
         }
         catch (Exception e) {
-//            return FormValidation.error(e, "Error validating SQS access");
             log.debug("Error validating SQS access", e);
-//            return false;
         }
         finally {
             client.shutdown();

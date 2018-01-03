@@ -23,8 +23,7 @@ public class UnexpectedException extends RuntimeException {
     public UnexpectedException(String s) {
         super(s);
     }
-
-
+    
     public UnexpectedException(Exception e) {
         super(e);
     }

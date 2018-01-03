@@ -19,13 +19,12 @@
     <f:textbox style="display: ${urlInputIndex == 1 ? '' : 'none'}" />
 
     <f:helpLink url="${descriptor.getHelpFile('url-selectbox')}" featureName="${title}" />
+
     <f:helpArea />
 
     <f:entry>
       <span>
-        you can also<st:nbsp/>
-        <a href="" onclick="return setUrlInputVisible(this, 'textbox')"><strong>enter queue url</strong></a><st:nbsp/>
-        or<st:nbsp/>
+        you can also<st:nbsp/><a href="" onclick="return setUrlInputVisible(this, 'textbox')"><strong>enter queue url</strong></a><st:nbsp/>or<st:nbsp/>
         <a href="" onclick="return setUrlInputVisible(this, 'select')"><strong>select queue</strong></a>
       </span>
     </f:entry>
@@ -33,6 +32,7 @@
 
   <f:entry field="credentialsId" title="Credentials" description='Support only "Standard Aws Credentials"'>
     <c:select context="com.ribose.jenkins.plugins.awscodecommittrigger.credentials.StandardAwsCredentials"/>
+    <a href="${rootURL}/credentials/store/system/domain/_/newCredentials">new credentials</a>
   </f:entry>
 
   <f:validateButton title="${%Test access}" with="url,credentialsId,urlInputIndex" method="validate"/>
@@ -47,3 +47,14 @@
     </f:entry>
   </f:advanced>
 </j:jelly>
+
+<!--
+
+if credentials support full controls needed
+    => OK
+else
+    => allow to enter url
+
+if credentials changed???
+
+-->

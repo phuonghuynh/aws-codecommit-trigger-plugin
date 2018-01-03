@@ -16,7 +16,7 @@
                     <j:if test="${not repoInfo.noUrlFound and instance.workflowJob}">
                         <f:block>
                         <p class="warning" style="margin-top: 0;">Trigger will read the SCM Steps defined in the<st:nbsp/>
-                            <a href="/jenkins/job/${instance.jobName}/lastBuild/flowGraphTable/">last build</a>
+                            <a href="${rootURL}/job/${instance.jobName}/lastBuild/flowGraphTable/">last build</a>
                         </p>
                         </f:block>
                     </j:if>

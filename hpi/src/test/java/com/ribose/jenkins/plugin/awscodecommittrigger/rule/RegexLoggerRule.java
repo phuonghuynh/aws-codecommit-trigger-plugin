@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.logging.*;
 import java.util.regex.Pattern;
 
+
 public class RegexLoggerRule extends ExternalResource {
 
     protected final Pattern regex;

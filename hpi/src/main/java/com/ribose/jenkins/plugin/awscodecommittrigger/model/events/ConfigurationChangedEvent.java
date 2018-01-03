@@ -1,6 +1,4 @@
-
 package com.ribose.jenkins.plugin.awscodecommittrigger.model.events;
-
 
 import com.ribose.jenkins.plugin.awscodecommittrigger.SQSTrigger;
 
